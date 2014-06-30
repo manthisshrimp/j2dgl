@@ -2,6 +2,7 @@ package j2dgl;
 
 import java.awt.Color;
 import java.awt.Graphics2D;
+import java.awt.Insets;
 import java.awt.image.BufferStrategy;
 
 public class RenderThread extends Thread {
@@ -32,6 +33,10 @@ public class RenderThread extends Thread {
 
                 if (rendering && buffer != null) {
                     g2 = (Graphics2D) buffer.getDrawGraphics();
+                    if (!coreRef.fullScreen) {
+                        Insets insets = coreRef.gameFrame.getInsets();
+                        g2.translate(insets.left, insets.top);
+                    }
                     double inWidth = coreRef.resolution.width;
                     double ratio = coreRef.gameFrame.getWidth() / inWidth;
                     g2.scale(ratio, ratio);
