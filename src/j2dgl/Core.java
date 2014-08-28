@@ -49,6 +49,7 @@ public abstract class Core {
 
     public Core(int width, int height) {
         resolution = new Dimension(width, height);
+        startLoop();
     }
 
     protected abstract void init();
@@ -57,15 +58,19 @@ public abstract class Core {
         return mouse;
     }
 
-    public void startLoop() {
+    public final void startLoop() {
         gameFrame = new J2dglFrame(this);
         gameFrame.setSize(resolution.width + 16, resolution.height + 30);
         gameFrame.setIgnoreRepaint(true);
         gameFrame.createBufferStrategy(2);
+        gameFrame.setResizable(false);
+        gameFrame.setLocationRelativeTo(null);
         renderThread = new RenderThread(gameFrame.getBufferStrategy(), this);
         renderThread.start();
 
         init();
+        
+        gameFrame.setVisible(true);
 
         long beginTime;
         long timeTaken;
@@ -73,6 +78,8 @@ public abstract class Core {
 
         while (running) {
             beginTime = System.nanoTime();
+            
+            coreKeyEvents();
 
             keyPressed(gameFrame.keyQueue);
             
@@ -94,8 +101,8 @@ public abstract class Core {
                 }
             }
         }
+        beforeClose();
 
-        exit();
         System.exit(0);
     }
 
@@ -118,16 +125,26 @@ public abstract class Core {
 
         if (gameFrame.keyQueue.size() > 0) {
             String keys = "";
-            for (KeyEvent evt : gameFrame.keyQueue) {
-                keys += evt.getKeyChar() + " ";
-            }
+            keys = gameFrame.keyQueue.stream().map((key) -> key + " ").reduce(keys, String::concat);
             g2.drawString("Keys: " + keys, 8, 320);
         }
 
         g2.drawString("Scroll Amount: " + scrollChange, 8, 280);
     }
 
-    protected abstract void keyPressed(ArrayList<KeyEvent> keyQueue);
+    protected abstract void keyPressed(ArrayList<Integer> keyQueue);
+    
+    private void coreKeyEvents() {
+        if (gameFrame.keyQueue.contains(KeyEvent.VK_0)) {
+            showDebug = !showDebug;
+            gameFrame.keyQueue.remove((Integer) KeyEvent.VK_0);
+        }
+        if (gameFrame.keyQueue.contains(KeyEvent.VK_CONTROL)
+                && gameFrame.keyQueue.contains(KeyEvent.VK_F)) {
+            gameFrame.toggleFullscreen();
+            gameFrame.keyQueue.remove((Integer) KeyEvent.VK_F);
+        }
+    }
     
     protected abstract void mouseDown(MouseEvent mouseEvent);
 
@@ -136,7 +153,11 @@ public abstract class Core {
                 && mouse.y >= entity.y && mouse.y <= entity.y + entity.height;
     }
 
-    protected abstract void exit();
+    protected abstract void beforeClose();
+    
+    public void exit() {
+        running = false;
+    }
 
     public void showErrorAndExit(String errorMessage) {
         JOptionPane.showMessageDialog(gameFrame, "ERROR: "

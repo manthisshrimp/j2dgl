@@ -4,7 +4,6 @@ import java.awt.Graphics;
 import java.awt.GraphicsDevice;
 import java.awt.GraphicsEnvironment;
 import java.awt.Point;
-import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 
@@ -13,7 +12,7 @@ public class J2dglFrame extends javax.swing.JFrame {
     private final GraphicsDevice screenDevice = GraphicsEnvironment
             .getLocalGraphicsEnvironment().getDefaultScreenDevice();
     private final Core coreRef;
-    public ArrayList<KeyEvent> keyQueue = new ArrayList<>();
+    public ArrayList<Integer> keyQueue = new ArrayList<>();
 
     private double mouseXCorrection = 1;
     private double mouseYCorrection = 1;
@@ -22,7 +21,6 @@ public class J2dglFrame extends javax.swing.JFrame {
         this.coreRef = coreReference;
 
         initComponents();
-//        setContentPane(new DrawCanvas());
         setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
     }
 
@@ -88,9 +86,8 @@ public class J2dglFrame extends javax.swing.JFrame {
     }//GEN-LAST:event_formMouseMoved
 
     private void formKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_formKeyPressed
-        KeyEvent foundKeyEvt = getKeyEventFromListByKeyCode(evt.getKeyCode());
-        if (foundKeyEvt == null) {
-            keyQueue.add(evt);
+        if (!keyQueue.contains(evt.getKeyCode())) {
+            keyQueue.add(evt.getKeyCode());
         }
     }//GEN-LAST:event_formKeyPressed
 
@@ -99,9 +96,8 @@ public class J2dglFrame extends javax.swing.JFrame {
     }//GEN-LAST:event_formWindowClosing
 
     private void formKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_formKeyReleased
-        KeyEvent foundKeyEvt = getKeyEventFromListByKeyCode(evt.getKeyCode());
-        if (keyQueue.contains(foundKeyEvt)) {
-            keyQueue.remove(foundKeyEvt);
+        if (keyQueue.contains(evt.getKeyCode())) {
+            keyQueue.remove((Integer) evt.getKeyCode());
         }
     }//GEN-LAST:event_formKeyReleased
 
@@ -141,18 +137,8 @@ public class J2dglFrame extends javax.swing.JFrame {
         }
     }
 
-    private KeyEvent getKeyEventFromListByKeyCode(int keyCode) {
-        for (KeyEvent evt : keyQueue) {
-            if (evt.getKeyCode() == keyCode) {
-                return evt;
-            }
-        }
-        return null;
-    }
-
     public void toggleFullscreen() {
         boolean wasResizable = isResizable();
-
         if (coreRef.fullScreen) {
             coreRef.renderThread.stopRendering();
             coreRef.fullScreen = false;
@@ -161,7 +147,6 @@ public class J2dglFrame extends javax.swing.JFrame {
             setUndecorated(false);
             setResizable(wasResizable);
             screenDevice.setFullScreenWindow(null);
-//            setExtendedState(java.awt.Frame.NORMAL);
             setVisible(true);
             mouseXCorrection = 1;
             mouseYCorrection = 1;
@@ -176,14 +161,15 @@ public class J2dglFrame extends javax.swing.JFrame {
             dispose();
             setUndecorated(true);
             screenDevice.setFullScreenWindow(this);
-//            setExtendedState(java.awt.Frame.MAXIMIZED_BOTH);
             setLocationRelativeTo(null);
             setVisible(true);
             mouseXCorrection = oldWidth / getWidth();
             mouseYCorrection = oldHeight / getHeight();
             coreRef.renderThread.startRendering(this.getBufferStrategy());
         }
-
+        java.awt.EventQueue.invokeLater(() -> {
+            toFront();
+        });
         keyQueue = new ArrayList<>();
     }
 
@@ -192,28 +178,6 @@ public class J2dglFrame extends javax.swing.JFrame {
         repaint();
     }
 
-//    private class DrawCanvas extends JPanel {
-//
-//        @Override
-//        public void paintComponent(Graphics g) {
-//            super.paintComponent(g);
-//            Graphics2D g2 = (Graphics2D) g;
-//
-//            BufferedImage inImg = coreRef.offscreenImg;
-//
-//            double inWidth = inImg.getWidth();
-//            double ratio = getWidth() / inWidth;
-//
-//            AffineTransform at = AffineTransform.getScaleInstance(ratio, ratio);
-//            g2.drawImage(inImg, at, null);
-//
-//            if (coreRef.showDebug) {
-//                g2.drawImage(coreRef.debugImg, 0, 0, null);
-//            }
-//
-//            coreRef.waitForDraw = false;
-//        }
-//    }
     // Variables declaration - do not modify//GEN-BEGIN:variables
     // End of variables declaration//GEN-END:variables
 }
