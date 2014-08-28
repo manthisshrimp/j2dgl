@@ -112,7 +112,6 @@ public class J2dglFrame extends javax.swing.JFrame {
 
     private void formMouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_formMouseReleased
         coreRef.mouseDown = false;
-        coreRef.performingClick = false;
     }//GEN-LAST:event_formMouseReleased
 
     private void formMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_formMouseClicked

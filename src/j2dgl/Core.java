@@ -24,18 +24,9 @@ public abstract class Core {
     // Core Flags
     protected boolean mouseDown = false;
     protected boolean doubleClicked = false;
-    protected boolean performingClick = false;
 
     public boolean isMouseDown() {
         return mouseDown;
-    }
-
-    public boolean isPerformingClick() {
-        return performingClick;
-    }
-
-    public void setPerformingClick(boolean clickPerformed) {
-        this.performingClick = clickPerformed;
     }
 
     public void forceMouseButtonState(boolean isDown) {
@@ -83,7 +74,10 @@ public abstract class Core {
 
             keyPressed(gameFrame.keyQueue);
             
-            mouseDown(lastMouseEvent);
+            if (lastMouseEvent != null) {
+                mouseDown(lastMouseEvent);
+                lastMouseEvent = null;
+            }
 
             update();
 
@@ -121,7 +115,6 @@ public abstract class Core {
         g2.drawString("Mouse X: " + mouse.x, 8, 160);
         g2.drawString("Mouse Y: " + mouse.y, 8, 180);
         g2.drawString("Mouse Down: " + mouseDown, 8, 200);
-        g2.drawString("Performing click: " + performingClick, 8, 220);
 
         if (gameFrame.keyQueue.size() > 0) {
             String keys = "";

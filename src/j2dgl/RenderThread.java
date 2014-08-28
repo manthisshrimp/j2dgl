@@ -40,10 +40,11 @@ public class RenderThread extends Thread {
                     double inWidth = coreRef.resolution.width;
                     double ratio = coreRef.gameFrame.getWidth() / inWidth;
                     g2.scale(ratio, ratio);
-                    coreRef.draw(g2);
-
+                    
                     g2.setColor(Color.BLACK);
                     g2.fillRect(0, 0, coreRef.resolution.width, coreRef.resolution.height);
+                    
+                    coreRef.draw(g2);
                     
                     if (coreRef.showDebug) {
                         coreRef.drawDebug(g2);
