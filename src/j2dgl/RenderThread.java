@@ -40,18 +40,17 @@ public class RenderThread extends Thread {
                     double inWidth = coreRef.resolution.width;
                     double ratio = coreRef.gameFrame.getWidth() / inWidth;
                     g2.scale(ratio, ratio);
-                    
+
                     g2.setColor(Color.BLACK);
                     g2.fillRect(0, 0, coreRef.resolution.width, coreRef.resolution.height);
-                    
+
                     coreRef.draw(g2);
-                    
+
                     if (coreRef.showDebug) {
                         coreRef.drawDebug(g2);
+                        g2.setColor(Color.GREEN);
+                        g2.drawString(String.valueOf(fps), 5, 15);
                     }
-                    
-                    g2.setColor(Color.GREEN);
-                    g2.drawString(String.valueOf(fps), 5, 15);
 
                     if (!buffer.contentsLost()) {
                         buffer.show();

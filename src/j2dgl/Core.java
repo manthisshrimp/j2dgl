@@ -109,20 +109,19 @@ public abstract class Core {
         g2.fillRect(0, 0, 160, gameFrame.getHeight());
         g2.setColor(Color.WHITE);
         g2.setFont(new Font("Serif", Font.BOLD, 14));
-        g2.drawString("Update Rate: " + updateRate, 8, 90);
+        g2.drawString("Update Rate: " + updateRate, 8, 40);
 
         g2.setColor(Color.WHITE);
-        g2.drawString("Mouse X: " + mouse.x, 8, 160);
-        g2.drawString("Mouse Y: " + mouse.y, 8, 180);
-        g2.drawString("Mouse Down: " + mouseDown, 8, 200);
-
+        g2.drawString("Mouse X: " + mouse.x, 8, 60);
+        g2.drawString("Mouse Y: " + mouse.y, 8, 80);
+        g2.drawString("Mouse Down: " + mouseDown, 8, 100);
+        g2.drawString("Scroll Amount: " + scrollChange, 8, 120);
+        
         if (gameFrame.keyQueue.size() > 0) {
             String keys = "";
             keys = gameFrame.keyQueue.stream().map((key) -> key + " ").reduce(keys, String::concat);
-            g2.drawString("Keys: " + keys, 8, 320);
+            g2.drawString("Keys: " + keys, 8, 140);
         }
-
-        g2.drawString("Scroll Amount: " + scrollChange, 8, 280);
     }
 
     protected abstract void keyPressed(ArrayList<Integer> keyQueue);
