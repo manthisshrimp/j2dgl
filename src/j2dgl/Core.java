@@ -4,6 +4,7 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Graphics2D;
+import java.awt.Insets;
 import java.awt.Point;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
@@ -16,14 +17,16 @@ public abstract class Core {
     protected int updateRate = 60;
     public int scrollChange = 0;
     // Core Objects
-    protected Point mouse = new Point(0, 0);
+    protected Point mouse = new Point(-20, -20);
     protected MouseEvent lastMouseEvent;
     protected J2dglFrame gameFrame;
     public RenderThread renderThread;
     protected Dimension resolution;
     // Core Flags
     protected boolean mouseDown = false;
+    protected boolean drawMouseDown = false;
     protected boolean doubleClicked = false;
+    private boolean clickDisabled = false;
 
     public boolean isMouseDown() {
         return mouseDown;
@@ -40,7 +43,6 @@ public abstract class Core {
 
     public Core(int width, int height) {
         resolution = new Dimension(width, height);
-        startLoop();
     }
 
     protected abstract void init();
@@ -51,15 +53,18 @@ public abstract class Core {
 
     public final void startLoop() {
         gameFrame = new J2dglFrame(this);
-        gameFrame.setSize(resolution.width + 16, resolution.height + 30);
+        Insets insets = gameFrame.getInsets();
+        gameFrame.setSize(resolution.width + insets.left, 
+                resolution.height + insets.top);
         gameFrame.setIgnoreRepaint(true);
         gameFrame.createBufferStrategy(2);
         gameFrame.setResizable(false);
         gameFrame.setLocationRelativeTo(null);
-        renderThread = new RenderThread(gameFrame.getBufferStrategy(), this);
-        renderThread.start();
 
         init();
+        
+        renderThread = new RenderThread(gameFrame.getBufferStrategy(), this);
+        renderThread.start();
         
         gameFrame.setVisible(true);
 
@@ -73,13 +78,13 @@ public abstract class Core {
             coreKeyEvents();
 
             keyPressed(gameFrame.keyQueue);
+
+            update();
             
             if (lastMouseEvent != null) {
                 mouseDown(lastMouseEvent);
                 lastMouseEvent = null;
             }
-
-            update();
 
             doubleClicked = false;
 
@@ -93,6 +98,10 @@ public abstract class Core {
                 } catch (InterruptedException ex) {
                     showErrorAndExit(ex.toString());
                 }
+            }
+            if (clickDisabled) {
+                mouseDown = false;
+                clickDisabled = false;
             }
         }
         beforeClose();
@@ -156,5 +165,9 @@ public abstract class Core {
                 + errorMessage, "AN ERROR HAS OCCURRED!",
                 JOptionPane.ERROR_MESSAGE);
         System.exit(1);
+    }
+
+    public void disableClick() {
+        this.clickDisabled = true;
     }
 }

@@ -1,10 +1,14 @@
 package j2dgl;
 
+import java.awt.Cursor;
 import java.awt.Graphics;
 import java.awt.GraphicsDevice;
 import java.awt.GraphicsEnvironment;
+import java.awt.Insets;
 import java.awt.Point;
+import java.awt.Toolkit;
 import java.awt.event.MouseEvent;
+import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 
 public class J2dglFrame extends javax.swing.JFrame {
@@ -16,6 +20,8 @@ public class J2dglFrame extends javax.swing.JFrame {
 
     private double mouseXCorrection = 1;
     private double mouseYCorrection = 1;
+
+    private boolean mouseVisible = true;
 
     public J2dglFrame(Core coreReference) {
         this.coreRef = coreReference;
@@ -107,11 +113,13 @@ public class J2dglFrame extends javax.swing.JFrame {
 
     private void formMousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_formMousePressed
         coreRef.mouseDown = true;
+        coreRef.drawMouseDown = true;
         coreRef.lastMouseEvent = evt;
     }//GEN-LAST:event_formMousePressed
 
     private void formMouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_formMouseReleased
         coreRef.mouseDown = false;
+        coreRef.drawMouseDown = false;
     }//GEN-LAST:event_formMouseReleased
 
     private void formMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_formMouseClicked
@@ -125,14 +133,14 @@ public class J2dglFrame extends javax.swing.JFrame {
     }//GEN-LAST:event_formMouseDragged
 
     private Point getCorrectedMouse(MouseEvent evt) {
-        double frameCorrectedMouseX = evt.getPoint().x - 3;
-        double frameCorrectedMouseY = evt.getPoint().y - 25;
-        if (!coreRef.fullScreen) {
-            return new Point(evt.getPoint().x - 3, evt.getPoint().y - 25);
-        } else {
-            double correctedMouseX = frameCorrectedMouseX * mouseXCorrection;
-            double correctedMouseY = frameCorrectedMouseY * mouseYCorrection;
+        if (coreRef.fullScreen) {
+            double correctedMouseX = evt.getPoint().x * mouseXCorrection;
+            double correctedMouseY = evt.getPoint().y * mouseYCorrection;
             return new Point((int) correctedMouseX, (int) correctedMouseY);
+        } else {
+            Insets insets = coreRef.gameFrame.getInsets();
+            return new Point(evt.getPoint().x - insets.left,
+                    evt.getPoint().y - insets.top);
         }
     }
 
@@ -152,8 +160,6 @@ public class J2dglFrame extends javax.swing.JFrame {
             coreRef.renderThread.startRendering(this.getBufferStrategy());
         } else {
             coreRef.renderThread.stopRendering();
-            double oldWidth = getWidth();
-            double oldHeight = getHeight();
             coreRef.fullScreen = true;
             setVisible(false);
             setResizable(false);
@@ -162,14 +168,27 @@ public class J2dglFrame extends javax.swing.JFrame {
             screenDevice.setFullScreenWindow(this);
             setLocationRelativeTo(null);
             setVisible(true);
-            mouseXCorrection = oldWidth / getWidth();
-            mouseYCorrection = oldHeight / getHeight();
+            mouseXCorrection = coreRef.resolution.width * 1D / getWidth();
+            mouseYCorrection = coreRef.resolution.height * 1D / getHeight();
             coreRef.renderThread.startRendering(this.getBufferStrategy());
         }
         java.awt.EventQueue.invokeLater(() -> {
             toFront();
         });
         keyQueue = new ArrayList<>();
+    }
+
+    public void toggleMouseVisibility() {
+        if (mouseVisible) {
+            BufferedImage cursorImg = new BufferedImage(16, 16, BufferedImage.TYPE_INT_ARGB);
+            Cursor blankCursor = Toolkit.getDefaultToolkit().createCustomCursor(
+                    cursorImg, new Point(0, 0), "blank cursor");
+            getContentPane().setCursor(blankCursor);
+            mouseVisible = !mouseVisible;
+        } else {
+            setCursor(Cursor.getDefaultCursor());
+            mouseVisible = !mouseVisible;
+        }
     }
 
     @Override
