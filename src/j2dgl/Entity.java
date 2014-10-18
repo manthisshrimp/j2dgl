@@ -94,4 +94,12 @@ public abstract class Entity {
     public void disposeLater() {
         disposeLater = true;
     }
+    
+    public boolean isVisible() {
+        return visible;
+    }
+
+    public void setVisible(boolean visible) {
+        this.visible = visible;
+    }
 }
