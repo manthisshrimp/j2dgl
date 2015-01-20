@@ -4,6 +4,7 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Graphics2D;
+import java.awt.Insets;
 import java.awt.Point;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
@@ -16,14 +17,25 @@ public abstract class Core {
     protected int updateRate = 60;
     public int scrollChange = 0;
     // Core Objects
-    protected Point mouse = new Point(0, 0);
+    protected Point mouse = new Point(-20, -20);
     protected MouseEvent lastMouseEvent;
     protected J2dglFrame gameFrame;
     public RenderThread renderThread;
     protected Dimension resolution;
     // Core Flags
     protected boolean mouseDown = false;
+    protected boolean drawMouseDown = false;
     protected boolean doubleClicked = false;
+    private boolean clickDisabled = false;
+
+    public boolean isMouseDown() {
+        return mouseDown;
+    }
+
+    public void forceMouseButtonState(boolean isDown) {
+        this.mouseDown = isDown;
+    }
+
     protected boolean fullScreen = false;
     protected boolean showDebug = false;
     protected boolean running = true;
@@ -31,20 +43,24 @@ public abstract class Core {
 
     public Core(int width, int height) {
         resolution = new Dimension(width, height);
-        startLoop();
     }
 
     protected abstract void init();
 
     public final void startLoop() {
         gameFrame = new J2dglFrame(this);
-        gameFrame.setSize(resolution.width + 16, resolution.height + 30);
+        Insets insets = gameFrame.getInsets();
+        gameFrame.setSize(resolution.width + insets.left, 
+                resolution.height + insets.top);
         gameFrame.setIgnoreRepaint(true);
         gameFrame.createBufferStrategy(2);
         gameFrame.setResizable(false);
         gameFrame.setLocationRelativeTo(null);
 
         init();
+        
+        renderThread = new RenderThread(gameFrame.getBufferStrategy(), this);
+        renderThread.start();
         
         renderThread = new RenderThread(gameFrame.getBufferStrategy(), this);
         renderThread.start();
@@ -58,11 +74,14 @@ public abstract class Core {
             beginTime = System.nanoTime();
             coreKeyEvents();
             keyPressed(gameFrame.keyQueue);
+
+            update();
+            
             if (lastMouseEvent != null) {
                 mouseDown(lastMouseEvent);
                 lastMouseEvent = null;
             }
-            update();
+
             doubleClicked = false;
             timeTaken = System.nanoTime() - beginTime;
             sleepTime = ((1000000000L / updateRate) - timeTaken) / 1000000L;
@@ -72,6 +91,10 @@ public abstract class Core {
                 } catch (InterruptedException ex) {
                     showErrorAndExit(ex.toString());
                 }
+            }
+            if (clickDisabled) {
+                mouseDown = false;
+                clickDisabled = false;
             }
         }
         beforeClose();
@@ -135,16 +158,8 @@ public abstract class Core {
                 JOptionPane.ERROR_MESSAGE);
         System.exit(1);
     }
-    
-    public boolean isMouseDown() {
-        return mouseDown;
-    }
 
-    public void forceMouseButtonState(boolean isDown) {
-        this.mouseDown = isDown;
-    }
-    
-    public Point getMouse() {
-        return mouse;
+    public void disableClick() {
+        this.clickDisabled = true;
     }
 }

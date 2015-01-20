@@ -33,13 +33,14 @@ public class RenderThread extends Thread {
 
                 if (rendering && buffer != null) {
                     g2 = (Graphics2D) buffer.getDrawGraphics();
-                    if (!coreRef.fullScreen) {
+                    if (coreRef.fullScreen) {
+                        double inWidth = coreRef.resolution.width;
+                        double ratio = coreRef.gameFrame.getWidth() / inWidth;
+                        g2.scale(ratio, ratio);
+                    } else {
                         Insets insets = coreRef.gameFrame.getInsets();
-                        g2.translate(insets.left, insets.top);
+                        g2.translate(insets.left , insets.top);
                     }
-                    double inWidth = coreRef.resolution.width;
-                    double ratio = coreRef.gameFrame.getWidth() / inWidth;
-                    g2.scale(ratio, ratio);
 
                     g2.setColor(Color.BLACK);
                     g2.fillRect(0, 0, coreRef.resolution.width, coreRef.resolution.height);
@@ -62,6 +63,8 @@ public class RenderThread extends Thread {
                 } catch (InterruptedException e) {
                     System.out.println("RenderThread woke up.");
                 }
+            } catch (NullPointerException ex) {
+                // Try to go on...
             } finally {
                 if (g2 != null) {
                     g2.dispose();
