@@ -24,15 +24,6 @@ public abstract class Core {
     // Core Flags
     protected boolean mouseDown = false;
     protected boolean doubleClicked = false;
-
-    public boolean isMouseDown() {
-        return mouseDown;
-    }
-
-    public void forceMouseButtonState(boolean isDown) {
-        this.mouseDown = isDown;
-    }
-
     protected boolean fullScreen = false;
     protected boolean showDebug = false;
     protected boolean running = true;
@@ -45,10 +36,6 @@ public abstract class Core {
 
     protected abstract void init();
 
-    public Point getMouse() {
-        return mouse;
-    }
-
     public final void startLoop() {
         gameFrame = new J2dglFrame(this);
         gameFrame.setSize(resolution.width + 16, resolution.height + 30);
@@ -56,11 +43,11 @@ public abstract class Core {
         gameFrame.createBufferStrategy(2);
         gameFrame.setResizable(false);
         gameFrame.setLocationRelativeTo(null);
-        renderThread = new RenderThread(gameFrame.getBufferStrategy(), this);
-        renderThread.start();
 
         init();
         
+        renderThread = new RenderThread(gameFrame.getBufferStrategy(), this);
+        renderThread.start();
         gameFrame.setVisible(true);
 
         long beginTime;
@@ -69,24 +56,16 @@ public abstract class Core {
 
         while (running) {
             beginTime = System.nanoTime();
-            
             coreKeyEvents();
-
             keyPressed(gameFrame.keyQueue);
-            
             if (lastMouseEvent != null) {
                 mouseDown(lastMouseEvent);
                 lastMouseEvent = null;
             }
-
             update();
-
             doubleClicked = false;
-
             timeTaken = System.nanoTime() - beginTime;
-
             sleepTime = ((1000000000L / updateRate) - timeTaken) / 1000000L;
-
             if (sleepTime > 0) {
                 try {
                     Thread.sleep(sleepTime);
@@ -96,7 +75,6 @@ public abstract class Core {
             }
         }
         beforeClose();
-
         System.exit(0);
     }
 
@@ -156,5 +134,17 @@ public abstract class Core {
                 + errorMessage, "AN ERROR HAS OCCURRED!",
                 JOptionPane.ERROR_MESSAGE);
         System.exit(1);
+    }
+    
+    public boolean isMouseDown() {
+        return mouseDown;
+    }
+
+    public void forceMouseButtonState(boolean isDown) {
+        this.mouseDown = isDown;
+    }
+    
+    public Point getMouse() {
+        return mouse;
     }
 }
