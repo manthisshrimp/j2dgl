@@ -17,6 +17,7 @@ public abstract class Entity {
     public int height;
 
     public Point target = new Point();
+    private Point location = new Point();
 
     public Entity(double x, double y, int width, int height) {
         this.x = x;
@@ -70,5 +71,11 @@ public abstract class Entity {
 
     public void disposeLater() {
         disposeLater = true;
+    }
+
+    public Point getLocation() {
+        location.x = (int) x;
+        location.y = (int) y;
+        return location;
     }
 }
