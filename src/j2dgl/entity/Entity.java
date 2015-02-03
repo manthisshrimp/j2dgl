@@ -1,4 +1,4 @@
-package j2dgl;
+package j2dgl.entity;
 
 import java.awt.Point;
 import java.awt.Rectangle;

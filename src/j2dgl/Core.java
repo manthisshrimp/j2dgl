@@ -1,5 +1,6 @@
 package j2dgl;
 
+import j2dgl.entity.Entity;
 import j2dgl.render.J2DGLFrame;
 import java.awt.Color;
 import java.awt.Dimension;

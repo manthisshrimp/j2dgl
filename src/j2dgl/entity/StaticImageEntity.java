@@ -1,6 +1,5 @@
 package j2dgl.entity;
 
-import j2dgl.Entity;
 import j2dgl.render.Renderable;
 import java.awt.Point;
 import java.awt.image.BufferedImage;
