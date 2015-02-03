@@ -1,5 +1,6 @@
 package j2dgl.render;
 
+import j2dgl.Boalean;
 import j2dgl.RenderThread;
 import java.awt.Cursor;
 import java.awt.Dimension;
@@ -20,18 +21,18 @@ public class J2DGLFrame extends javax.swing.JFrame {
     private ArrayList<Integer> keyQueue;
     private MouseEvent lastMouseEvent;
     private final RenderThread renderThread;
-    private Boolean mouseDown;
+    private Boalean mouseDown;
     private final Runnable exitMethod;
     private Insets insets;
     private final Dimension resolution;
     private final Point mouse;
     private boolean fullscreen = false;
-    
+
     private double mouseXCorrection = 1;
     private double mouseYCorrection = 1;
 
     public J2DGLFrame(ArrayList<Integer> keyQueue, MouseEvent lastMouseEvent, Dimension resolution,
-            RenderThread renderThread, Boolean mouseDown, Runnable exitMethod, Point mouse) throws HeadlessException {
+            RenderThread renderThread, Boalean mouseDown, Runnable exitMethod, Point mouse) throws HeadlessException {
         this.keyQueue = keyQueue;
         this.lastMouseEvent = lastMouseEvent;
         this.renderThread = renderThread;
@@ -119,12 +120,12 @@ public class J2DGLFrame extends javax.swing.JFrame {
 
     private void formMousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_formMousePressed
         lastMouseEvent = evt;
-        mouseDown = true;
+        mouseDown.setValue(true);
     }//GEN-LAST:event_formMousePressed
 
     private void formMouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_formMouseReleased
         lastMouseEvent = evt;
-        mouseDown = false;
+        mouseDown.setValue(false);
     }//GEN-LAST:event_formMouseReleased
 
     private void formMouseWheelMoved(java.awt.event.MouseWheelEvent evt) {//GEN-FIRST:event_formMouseWheelMoved
@@ -136,18 +137,16 @@ public class J2DGLFrame extends javax.swing.JFrame {
     }//GEN-LAST:event_formWindowClosing
 
     private void formMouseMoved(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_formMouseMoved
-        mouse.x = evt.getPoint().x;
-        mouse.y = evt.getPoint().y;
+        updateMouse(evt);
     }//GEN-LAST:event_formMouseMoved
 
-    private Point getCorrectedMouse(MouseEvent evt) {
+    private void updateMouse(MouseEvent evt) {
         if (fullscreen) {
-            double correctedMouseX = evt.getPoint().x * mouseXCorrection;
-            double correctedMouseY = evt.getPoint().y * mouseYCorrection;
-            return new Point((int) correctedMouseX, (int) correctedMouseY);
+            mouse.x = (int) Math.round(evt.getPoint().x * mouseXCorrection);
+            mouse.y = (int) Math.round(evt.getPoint().y * mouseYCorrection);
         } else {
-            return new Point(evt.getPoint().x - insets.left,
-                    evt.getPoint().y - insets.top);
+            mouse.x = evt.getPoint().x - insets.left;
+            mouse.y = evt.getPoint().y - insets.top;
         }
     }
 
@@ -161,10 +160,9 @@ public class J2DGLFrame extends javax.swing.JFrame {
             dispose();
             setUndecorated(true);
             screenDevice.setFullScreenWindow(this);
-            setLocationRelativeTo(null);
             setVisible(true);
-            mouseXCorrection = 1;
-            mouseYCorrection = 1;
+            mouseXCorrection = resolution.width * 1D / getWidth();
+            mouseYCorrection = resolution.height * 1D / getHeight();
             renderThread.enableRendering(getBufferStrategy(), insets);
         } else {
             renderThread.disableRendering();
@@ -173,9 +171,10 @@ public class J2DGLFrame extends javax.swing.JFrame {
             setUndecorated(false);
             setResizable(wasResizable);
             screenDevice.setFullScreenWindow(null);
+            setLocationRelativeTo(null);
             setVisible(true);
-            mouseXCorrection = resolution.width * 1D / getWidth();
-            mouseYCorrection = resolution.height * 1D / getHeight();
+            mouseXCorrection = 1;
+            mouseYCorrection = 1;
             renderThread.enableRendering(getBufferStrategy(), insets);
         }
         java.awt.EventQueue.invokeLater(() -> {

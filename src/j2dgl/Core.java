@@ -26,14 +26,14 @@ public abstract class Core {
     protected Point mouse = new Point(-1, -1);
     // Core Flags
     private boolean clickDisabled = false;
-    private Boolean mouseDown = false;
+    private Boalean mouseDown = new Boalean(false);
 
     public boolean isMouseDown() {
-        return mouseDown;
+        return mouseDown.getValue();
     }
 
     public void forceMouseButtonState(boolean isDown) {
-        this.mouseDown = isDown;
+        mouseDown.setValue(isDown);
     }
 
     protected boolean fullScreen = false;
@@ -84,7 +84,7 @@ public abstract class Core {
                 }
             }
             if (clickDisabled) {
-                mouseDown = false;
+                mouseDown.setValue(false);
                 clickDisabled = false;
             }
         }
@@ -106,7 +106,7 @@ public abstract class Core {
         g2.setColor(Color.WHITE);
         g2.drawString("Mouse X: " + mouse.x, 8, 60);
         g2.drawString("Mouse Y: " + mouse.y, 8, 80);
-        g2.drawString("Mouse Down: " + mouseDown, 8, 100);
+        g2.drawString("Mouse Down: " + mouseDown.getValue(), 8, 100);
         g2.drawString("Scroll Amount: " + scrollChange, 8, 120);
 
         if (keyQueue.size() > 0) {
