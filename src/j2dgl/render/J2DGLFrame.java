@@ -4,6 +4,7 @@ import j2dgl.Boalean;
 import j2dgl.RenderThread;
 import java.awt.Cursor;
 import java.awt.Dimension;
+import java.awt.Graphics;
 import java.awt.GraphicsDevice;
 import java.awt.GraphicsEnvironment;
 import java.awt.HeadlessException;
@@ -21,7 +22,7 @@ public class J2DGLFrame extends javax.swing.JFrame {
     private ArrayList<Integer> keyQueue;
     private MouseEvent lastMouseEvent;
     private final RenderThread renderThread;
-    private Boalean mouseDown;
+    private final Boalean mouseDown;
     private final Runnable exitMethod;
     private Insets insets;
     private final Dimension resolution;
@@ -43,7 +44,6 @@ public class J2DGLFrame extends javax.swing.JFrame {
 
         setIgnoreRepaint(true);
         setResizable(false);
-        setLocationRelativeTo(null);
 
         initComponents();
     }
@@ -160,6 +160,7 @@ public class J2DGLFrame extends javax.swing.JFrame {
             dispose();
             setUndecorated(true);
             screenDevice.setFullScreenWindow(this);
+            setLocationRelativeTo(null);
             setVisible(true);
             mouseXCorrection = resolution.width * 1D / getWidth();
             mouseYCorrection = resolution.height * 1D / getHeight();
@@ -198,6 +199,7 @@ public class J2DGLFrame extends javax.swing.JFrame {
         insets = getInsets();
         setSize(resolution.width + insets.left,
                 resolution.height + insets.top);
+        setLocationRelativeTo(null);
         setVisible(true);
         createBufferStrategy(2);
         renderThread.enableRendering(getBufferStrategy(), insets);

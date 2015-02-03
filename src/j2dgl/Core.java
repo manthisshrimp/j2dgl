@@ -26,11 +26,7 @@ public abstract class Core {
     protected Point mouse = new Point(-1, -1);
     // Core Flags
     private boolean clickDisabled = false;
-    private Boalean mouseDown = new Boalean(false);
-
-    public boolean isMouseDown() {
-        return mouseDown.getValue();
-    }
+    protected Boalean mouseDown = new Boalean(false);
 
     public void forceMouseButtonState(boolean isDown) {
         mouseDown.setValue(isDown);

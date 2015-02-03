@@ -1,5 +1,6 @@
 package j2dgl.ui;
 
+import j2dgl.Boalean;
 import j2dgl.entity.DrawableEntity;
 import java.awt.Color;
 import java.awt.FontMetrics;
@@ -22,9 +23,9 @@ public class ListView<T extends Object> extends DrawableEntity {
     private Color foregroundColor = Color.BLACK;
 
     private final Point mouse;
-    private final Boolean mouseDown;
+    private final Boalean mouseDown;
 
-    public ListView(double x, double y, int width, int height, Point mouse, Boolean mouseDown) {
+    public ListView(double x, double y, int width, int height, Point mouse, Boalean mouseDown) {
         super(x, y, width, height);
         this.mouse = mouse;
         this.mouseDown = mouseDown;
@@ -48,10 +49,10 @@ public class ListView<T extends Object> extends DrawableEntity {
             g2.drawLine(3, (i * 25) + 25, width - 4, (i * 25) + 25);
             g2.setColor(foregroundColor);
             FontMetrics fm = g2.getFontMetrics();
-            int textWidth = fm.stringWidth("" + hoverIndex);
+            int textWidth = fm.stringWidth(items.get(i).toString());
             int textLeft = width / 2 - textWidth / 2;
             int textTop = 12 + (i * 25) + 5;
-            g2.drawString("" + hoverIndex, textLeft, textTop);
+            g2.drawString(items.get(i).toString(), textLeft, textTop);
         }
     }
 
@@ -64,7 +65,7 @@ public class ListView<T extends Object> extends DrawableEntity {
                 currentItemArea = new Rectangle(i, i * 25, width, 25);
                 if (currentItemArea.contains(localMouse)) {
                     hoverIndex = i;
-                    if (mouseDown) {
+                    if (mouseDown.getValue()) {
                         selectedIndex = i;
                         selectedItem = items.get(selectedIndex);
                     }
