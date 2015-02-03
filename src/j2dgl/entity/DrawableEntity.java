@@ -18,8 +18,6 @@ public abstract class DrawableEntity extends Entity implements Renderable {
         g2 = (Graphics2D) image.getGraphics();
         g2.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING,
                 RenderingHints.VALUE_TEXT_ANTIALIAS_LCD_HRGB);
-
-        image = getImage();
     }
 
     protected abstract void draw(Graphics2D g2);
