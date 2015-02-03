@@ -1,10 +1,10 @@
 package j2dgl;
 
+import j2dgl.render.J2DGLFrame;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Graphics2D;
-import java.awt.Insets;
 import java.awt.Point;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
@@ -17,16 +17,15 @@ public abstract class Core {
     protected int updateRate = 60;
     public int scrollChange = 0;
     // Core Objects
-    protected Point mouse = new Point(-20, -20);
     protected MouseEvent lastMouseEvent;
-    protected J2dglFrame gameFrame;
+    protected J2DGLFrame frame;
     public RenderThread renderThread;
     protected Dimension resolution;
+    private final ArrayList<Integer> keyQueue = new ArrayList<>();
+    protected Point mouse = new Point(-1, -1);
     // Core Flags
-    protected boolean mouseDown = false;
-    protected boolean drawMouseDown = false;
-    protected boolean doubleClicked = false;
     private boolean clickDisabled = false;
+    private Boolean mouseDown = false;
 
     public boolean isMouseDown() {
         return mouseDown;
@@ -48,23 +47,15 @@ public abstract class Core {
     protected abstract void init();
 
     public final void startLoop() {
-        gameFrame = new J2dglFrame(this);
-        Insets insets = gameFrame.getInsets();
-        gameFrame.setSize(resolution.width + insets.left, 
-                resolution.height + insets.top);
-        gameFrame.setIgnoreRepaint(true);
-        gameFrame.createBufferStrategy(2);
-        gameFrame.setResizable(false);
-        gameFrame.setLocationRelativeTo(null);
+        renderThread = new RenderThread(this);
+        frame = new J2DGLFrame(keyQueue, lastMouseEvent, resolution, renderThread, mouseDown,
+                () -> {
+                    exit();
+                }, mouse);
 
         init();
-        
-        renderThread = new RenderThread(gameFrame.getBufferStrategy(), this);
-        renderThread.start();
-        
-        renderThread = new RenderThread(gameFrame.getBufferStrategy(), this);
-        renderThread.start();
-        gameFrame.setVisible(true);
+
+        frame.display();
 
         long beginTime;
         long timeTaken;
@@ -73,16 +64,15 @@ public abstract class Core {
         while (running) {
             beginTime = System.nanoTime();
             coreKeyEvents();
-            keyPressed(gameFrame.keyQueue);
+            keyPressed(keyQueue);
 
             update();
-            
+
             if (lastMouseEvent != null) {
                 mouseDown(lastMouseEvent);
                 lastMouseEvent = null;
             }
 
-            doubleClicked = false;
             timeTaken = System.nanoTime() - beginTime;
             sleepTime = ((1000000000L / updateRate) - timeTaken) / 1000000L;
             if (sleepTime > 0) {
@@ -107,7 +97,7 @@ public abstract class Core {
 
     public void drawDebug(Graphics2D g2) {
         g2.setColor(Color.BLACK);
-        g2.fillRect(0, 0, 160, gameFrame.getHeight());
+        g2.fillRect(0, 0, 160, resolution.height);
         g2.setColor(Color.WHITE);
         g2.setFont(new Font("Serif", Font.BOLD, 14));
         g2.drawString("Update Rate: " + updateRate, 8, 40);
@@ -117,43 +107,49 @@ public abstract class Core {
         g2.drawString("Mouse Y: " + mouse.y, 8, 80);
         g2.drawString("Mouse Down: " + mouseDown, 8, 100);
         g2.drawString("Scroll Amount: " + scrollChange, 8, 120);
-        
-        if (gameFrame.keyQueue.size() > 0) {
+
+        if (keyQueue.size() > 0) {
             String keys = "";
-            keys = gameFrame.keyQueue.stream().map((key) -> key + " ").reduce(keys, String::concat);
+            keys = keyQueue.stream().map((key) -> key + " ").reduce(keys, String::concat);
             g2.drawString("Keys: " + keys, 8, 140);
         }
     }
 
     protected abstract void keyPressed(ArrayList<Integer> keyQueue);
-    
+
     private void coreKeyEvents() {
-        if (gameFrame.keyQueue.contains(KeyEvent.VK_0)) {
+        if (keyQueue.contains(KeyEvent.VK_0)) {
             showDebug = !showDebug;
-            gameFrame.keyQueue.remove((Integer) KeyEvent.VK_0);
+            keyQueue.remove((Integer) KeyEvent.VK_0);
         }
-        if (gameFrame.keyQueue.contains(KeyEvent.VK_CONTROL)
-                && gameFrame.keyQueue.contains(KeyEvent.VK_F)) {
-            gameFrame.toggleFullscreen();
-            gameFrame.keyQueue.remove((Integer) KeyEvent.VK_F);
+        if (keyQueue.contains(KeyEvent.VK_CONTROL)
+                && keyQueue.contains(KeyEvent.VK_F)) {
+            fullScreen = !fullScreen;
+            frame.setFullscreen(fullScreen);
+            keyQueue.remove((Integer) KeyEvent.VK_F);
+        }
+        if (keyQueue.contains(KeyEvent.VK_ESCAPE)) {
+            exit();
         }
     }
-    
+
     protected abstract void mouseDown(MouseEvent mouseEvent);
 
     public boolean isMouseOverEntity(Entity entity) {
-        return mouse.x >= entity.x && mouse.x <= entity.x + entity.width 
-                && mouse.y >= entity.y && mouse.y <= entity.y + entity.height;
+        return mouse.x >= entity.x
+                && mouse.x <= entity.x + entity.width
+                && mouse.y >= entity.y
+                && mouse.y <= entity.y + entity.height;
     }
 
     protected abstract void beforeClose();
-    
+
     public void exit() {
         running = false;
     }
 
     public void showErrorAndExit(String errorMessage) {
-        JOptionPane.showMessageDialog(gameFrame, "ERROR: "
+        JOptionPane.showMessageDialog(frame, "ERROR: "
                 + errorMessage, "AN ERROR HAS OCCURRED!",
                 JOptionPane.ERROR_MESSAGE);
         System.exit(1);

@@ -7,17 +7,17 @@ import java.awt.image.BufferStrategy;
 
 public class RenderThread extends Thread {
 
-    private static Graphics2D g2;
-    private static long timeBeginLoop;
-    private static int fps;
-    private static long iteration = 0;
-    private static BufferStrategy buffer;
+    private Graphics2D g2;
+    private long timeBeginLoop;
+    private int fps;
+    private long iteration = 0;
+    private BufferStrategy buffer;
     private final Core coreRef;
     private boolean rendering = true;
+    private Insets insets;
 
-    public RenderThread(BufferStrategy b, Core core) {
+    public RenderThread(Core core) {
         this.coreRef = core;
-        buffer = b;
     }
 
     @Override
@@ -32,17 +32,18 @@ public class RenderThread extends Thread {
                 timeBeginLoop = System.nanoTime();
 
                 if (rendering && buffer != null) {
+
                     g2 = (Graphics2D) buffer.getDrawGraphics();
+
                     if (coreRef.fullScreen) {
                         double inWidth = coreRef.resolution.width;
-                        double ratio = coreRef.gameFrame.getWidth() / inWidth;
+                        double ratio = coreRef.frame.getWidth() / inWidth;
                         g2.scale(ratio, ratio);
                     } else {
-                        Insets insets = coreRef.gameFrame.getInsets();
-                        g2.translate(insets.left , insets.top);
+                        g2.translate(insets.left, insets.top);
                     }
 
-                    g2.setColor(Color.BLACK);
+                    g2.setColor(Color.black);
                     g2.fillRect(0, 0, coreRef.resolution.width, coreRef.resolution.height);
 
                     coreRef.draw(g2);
@@ -55,6 +56,8 @@ public class RenderThread extends Thread {
 
                     if (!buffer.contentsLost()) {
                         buffer.show();
+                    } else {
+                        System.out.println("Buffer contents lost");
                     }
                 }
 
@@ -64,7 +67,7 @@ public class RenderThread extends Thread {
                     System.out.println("RenderThread woke up.");
                 }
             } catch (NullPointerException ex) {
-                // Try to go on...
+//                 Try to go on...
             } finally {
                 if (g2 != null) {
                     g2.dispose();
@@ -73,12 +76,13 @@ public class RenderThread extends Thread {
         }
     }
 
-    public void stopRendering() {
+    public void disableRendering() {
         rendering = false;
     }
 
-    public void startRendering(BufferStrategy b) {
-        buffer = b;
+    public void enableRendering(BufferStrategy bufferStrategy, Insets insets) {
+        this.insets = insets;
+        this.buffer = bufferStrategy;
         rendering = true;
     }
 }

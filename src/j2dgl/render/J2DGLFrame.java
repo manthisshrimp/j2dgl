@@ -1,9 +1,11 @@
-package j2dgl;
+package j2dgl.render;
 
+import j2dgl.RenderThread;
 import java.awt.Cursor;
-import java.awt.Graphics;
+import java.awt.Dimension;
 import java.awt.GraphicsDevice;
 import java.awt.GraphicsEnvironment;
+import java.awt.HeadlessException;
 import java.awt.Insets;
 import java.awt.Point;
 import java.awt.Toolkit;
@@ -11,23 +13,38 @@ import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 
-public class J2dglFrame extends javax.swing.JFrame {
+public class J2DGLFrame extends javax.swing.JFrame {
 
     private final GraphicsDevice screenDevice = GraphicsEnvironment
             .getLocalGraphicsEnvironment().getDefaultScreenDevice();
-    private final Core coreRef;
-    public ArrayList<Integer> keyQueue = new ArrayList<>();
-
+    private ArrayList<Integer> keyQueue;
+    private MouseEvent lastMouseEvent;
+    private final RenderThread renderThread;
+    private Boolean mouseDown;
+    private final Runnable exitMethod;
+    private Insets insets;
+    private final Dimension resolution;
+    private final Point mouse;
+    private boolean fullscreen = false;
+    
     private double mouseXCorrection = 1;
     private double mouseYCorrection = 1;
 
-    private boolean mouseVisible = true;
+    public J2DGLFrame(ArrayList<Integer> keyQueue, MouseEvent lastMouseEvent, Dimension resolution,
+            RenderThread renderThread, Boolean mouseDown, Runnable exitMethod, Point mouse) throws HeadlessException {
+        this.keyQueue = keyQueue;
+        this.lastMouseEvent = lastMouseEvent;
+        this.renderThread = renderThread;
+        this.mouseDown = mouseDown;
+        this.exitMethod = exitMethod;
+        this.resolution = resolution;
+        this.mouse = mouse;
 
-    public J2dglFrame(Core coreReference) {
-        this.coreRef = coreReference;
+        setIgnoreRepaint(true);
+        setResizable(false);
+        setLocationRelativeTo(null);
 
         initComponents();
-        setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
     }
 
     @SuppressWarnings("unchecked")
@@ -35,15 +52,17 @@ public class J2dglFrame extends javax.swing.JFrame {
     private void initComponents() {
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        addMouseMotionListener(new java.awt.event.MouseMotionAdapter() {
+            public void mouseMoved(java.awt.event.MouseEvent evt) {
+                formMouseMoved(evt);
+            }
+        });
         addMouseWheelListener(new java.awt.event.MouseWheelListener() {
             public void mouseWheelMoved(java.awt.event.MouseWheelEvent evt) {
                 formMouseWheelMoved(evt);
             }
         });
         addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseClicked(java.awt.event.MouseEvent evt) {
-                formMouseClicked(evt);
-            }
             public void mousePressed(java.awt.event.MouseEvent evt) {
                 formMousePressed(evt);
             }
@@ -52,16 +71,11 @@ public class J2dglFrame extends javax.swing.JFrame {
             }
         });
         addWindowListener(new java.awt.event.WindowAdapter() {
+            public void windowClosed(java.awt.event.WindowEvent evt) {
+                formWindowClosed(evt);
+            }
             public void windowClosing(java.awt.event.WindowEvent evt) {
                 formWindowClosing(evt);
-            }
-        });
-        addMouseMotionListener(new java.awt.event.MouseMotionAdapter() {
-            public void mouseDragged(java.awt.event.MouseEvent evt) {
-                formMouseDragged(evt);
-            }
-            public void mouseMoved(java.awt.event.MouseEvent evt) {
-                formMouseMoved(evt);
             }
         });
         addKeyListener(new java.awt.event.KeyAdapter() {
@@ -87,19 +101,11 @@ public class J2dglFrame extends javax.swing.JFrame {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    private void formMouseMoved(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_formMouseMoved
-//        coreRef.mouse = getCorrectedMouse(evt);
-    }//GEN-LAST:event_formMouseMoved
-
     private void formKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_formKeyPressed
         if (!keyQueue.contains(evt.getKeyCode())) {
             keyQueue.add(evt.getKeyCode());
         }
     }//GEN-LAST:event_formKeyPressed
-
-    private void formWindowClosing(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowClosing
-        coreRef.exit();
-    }//GEN-LAST:event_formWindowClosing
 
     private void formKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_formKeyReleased
         if (keyQueue.contains(evt.getKeyCode())) {
@@ -107,60 +113,49 @@ public class J2dglFrame extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_formKeyReleased
 
-    private void formMouseWheelMoved(java.awt.event.MouseWheelEvent evt) {//GEN-FIRST:event_formMouseWheelMoved
-        coreRef.scrollChange = evt.getUnitsToScroll() * -1;
-    }//GEN-LAST:event_formMouseWheelMoved
+    private void formWindowClosed(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowClosed
+//        exitMethod.run();
+    }//GEN-LAST:event_formWindowClosed
 
     private void formMousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_formMousePressed
-//        coreRef.mouseDown = true;
-//        coreRef.drawMouseDown = true;
-        coreRef.lastMouseEvent = evt;
+        lastMouseEvent = evt;
+        mouseDown = true;
     }//GEN-LAST:event_formMousePressed
 
     private void formMouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_formMouseReleased
-//        coreRef.mouseDown = false;
-//        coreRef.drawMouseDown = false;
+        lastMouseEvent = evt;
+        mouseDown = false;
     }//GEN-LAST:event_formMouseReleased
 
-    private void formMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_formMouseClicked
-        if (evt.getClickCount() == 2) {
-//            coreRef.doubleClicked = true;
-        }
-    }//GEN-LAST:event_formMouseClicked
+    private void formMouseWheelMoved(java.awt.event.MouseWheelEvent evt) {//GEN-FIRST:event_formMouseWheelMoved
+        lastMouseEvent = evt;
+    }//GEN-LAST:event_formMouseWheelMoved
 
-    private void formMouseDragged(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_formMouseDragged
-//        coreRef.mouse = getCorrectedMouse(evt);
-    }//GEN-LAST:event_formMouseDragged
+    private void formWindowClosing(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowClosing
+        exitMethod.run();
+    }//GEN-LAST:event_formWindowClosing
+
+    private void formMouseMoved(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_formMouseMoved
+        mouse.x = evt.getPoint().x;
+        mouse.y = evt.getPoint().y;
+    }//GEN-LAST:event_formMouseMoved
 
     private Point getCorrectedMouse(MouseEvent evt) {
-        if (coreRef.fullScreen) {
+        if (fullscreen) {
             double correctedMouseX = evt.getPoint().x * mouseXCorrection;
             double correctedMouseY = evt.getPoint().y * mouseYCorrection;
             return new Point((int) correctedMouseX, (int) correctedMouseY);
         } else {
-            Insets insets = coreRef.frame.getInsets();
             return new Point(evt.getPoint().x - insets.left,
                     evt.getPoint().y - insets.top);
         }
     }
 
-    public void setFullscreen(boolean fullScreen) {
+    public void setFullscreen(boolean fullscreen) {
+        this.fullscreen = fullscreen;
         boolean wasResizable = isResizable();
-        if (coreRef.fullScreen) {
-            coreRef.renderThread.disableRendering();
-            coreRef.fullScreen = false;
-            setVisible(false);
-            dispose();
-            setUndecorated(false);
-            setResizable(wasResizable);
-            screenDevice.setFullScreenWindow(null);
-            setVisible(true);
-            mouseXCorrection = 1;
-            mouseYCorrection = 1;
-//            coreRef.renderThread.enableRendering(this.getBufferStrategy());
-        } else {
-            coreRef.renderThread.disableRendering();
-            coreRef.fullScreen = true;
+        if (fullscreen) {
+            renderThread.disableRendering();
             setVisible(false);
             setResizable(false);
             dispose();
@@ -168,9 +163,20 @@ public class J2dglFrame extends javax.swing.JFrame {
             screenDevice.setFullScreenWindow(this);
             setLocationRelativeTo(null);
             setVisible(true);
-            mouseXCorrection = coreRef.resolution.width * 1D / getWidth();
-            mouseYCorrection = coreRef.resolution.height * 1D / getHeight();
-//            coreRef.renderThread.enableRendering(this.getBufferStrategy());
+            mouseXCorrection = 1;
+            mouseYCorrection = 1;
+            renderThread.enableRendering(getBufferStrategy(), insets);
+        } else {
+            renderThread.disableRendering();
+            setVisible(false);
+            dispose();
+            setUndecorated(false);
+            setResizable(wasResizable);
+            screenDevice.setFullScreenWindow(null);
+            setVisible(true);
+            mouseXCorrection = resolution.width * 1D / getWidth();
+            mouseYCorrection = resolution.height * 1D / getHeight();
+            renderThread.enableRendering(getBufferStrategy(), insets);
         }
         java.awt.EventQueue.invokeLater(() -> {
             toFront();
@@ -178,22 +184,25 @@ public class J2dglFrame extends javax.swing.JFrame {
         keyQueue = new ArrayList<>();
     }
 
-    public void toggleMouseVisibility() {
+    public void setMouseVisible(boolean mouseVisible) {
         if (mouseVisible) {
             BufferedImage cursorImg = new BufferedImage(16, 16, BufferedImage.TYPE_INT_ARGB);
             Cursor blankCursor = Toolkit.getDefaultToolkit().createCustomCursor(
                     cursorImg, new Point(0, 0), "blank cursor");
             getContentPane().setCursor(blankCursor);
-            mouseVisible = !mouseVisible;
         } else {
             setCursor(Cursor.getDefaultCursor());
-            mouseVisible = !mouseVisible;
         }
     }
 
-    @Override
-    public void update(Graphics g) {
-        repaint();
+    public void display() {
+        insets = getInsets();
+        setSize(resolution.width + insets.left,
+                resolution.height + insets.top);
+        setVisible(true);
+        createBufferStrategy(2);
+        renderThread.enableRendering(getBufferStrategy(), insets);
+        renderThread.start();
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
