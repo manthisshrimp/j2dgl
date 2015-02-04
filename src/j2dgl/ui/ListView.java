@@ -1,56 +1,64 @@
 package j2dgl.ui;
 
 import j2dgl.Boalean;
-import j2dgl.entity.DrawableEntity;
 import java.awt.Color;
-import java.awt.FontMetrics;
 import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.util.ArrayList;
 
-public class ListView<T extends Object> extends DrawableEntity {
+public class ListView<T extends Object> extends UIComponent {
 
     private final ArrayList<T> items = new ArrayList<>();
     private T selectedItem = null;
     private int selectedIndex = -1;
     private int hoverIndex = -1;
 
-    private Color backgroundColor = Color.DARK_GRAY;
-    private Color lineColor = Color.GRAY;
-    private Color hoverColor = Color.YELLOW;
-    private Color selectedColor = Color.ORANGE;
-    private Color foregroundColor = Color.BLACK;
-
-    private final Point mouse;
-    private final Boalean mouseDown;
+    private Color backgroundColor = new Color(0x1A1A1A);
+    private Color alternateBackgroundColor = new Color(0x242424);
+    private Color hoverColor = new Color(0x454545);
+    private Color selectedColor = new Color(0xE3E3E3);
+    private Color foregroundColor = Color.WHITE;
+    private Color selectedForegroundColor = Color.BLACK;
 
     public ListView(double x, double y, int width, int height, Point mouse, Boalean mouseDown) {
-        super(x, y, width, height);
-        this.mouse = mouse;
-        this.mouseDown = mouseDown;
+        super(x, y, width, height, mouse, mouseDown);
     }
 
     @Override
     protected void draw(Graphics2D g2) {
-        g2.setColor(backgroundColor);
-        g2.fillRect(0, 0, width, height);
-        g2.setColor(lineColor);
-        g2.drawRect(0, 0, width - 1, height - 1);
+        drawBackground(g2);
+        drawItems(g2);
+        drawBorder(g2);
+    }
+
+    private void drawBackground(Graphics2D g2) {
+        int lines = (height / 25) + 1;
+        for (int i = 0; i < lines; i++) {
+            if (i % 2 == 0) {
+                g2.setColor(getBackgroundColor());
+            } else {
+                g2.setColor(getAlternateBackgroundColor());
+            }
+            g2.fillRect(1, (i * 25) + 1, width - 2, 25);
+        }
+    }
+
+    private void drawItems(Graphics2D g2) {
         for (int i = 0; i < items.size(); i++) {
             if (i == selectedIndex) {
-                g2.setColor(selectedColor);
-                g2.fillRect(1, (i * 25) + 1, width - 2, 23);
+                g2.setColor(getSelectedColor());
+                g2.fillRect(1, (i * 25) + 1, width - 2, 25);
             } else if (i == hoverIndex) {
-                g2.setColor(hoverColor);
-                g2.fillRect(1, (i * 25) + 1, width - 2, 23);
+                g2.setColor(getHoverColor());
+                g2.fillRect(1, (i * 25) + 1, width - 2, 25);
             }
-            g2.setColor(lineColor);
-            g2.drawLine(3, (i * 25) + 25, width - 4, (i * 25) + 25);
-            g2.setColor(foregroundColor);
-            FontMetrics fm = g2.getFontMetrics();
-            int textWidth = fm.stringWidth(items.get(i).toString());
-            int textLeft = width / 2 - textWidth / 2;
+            if (i == selectedIndex) {
+                g2.setColor(getSelectedForegroundColor());
+            } else {
+                g2.setColor(getForegroundColor());
+            }
+            int textLeft = 8;
             int textTop = 12 + (i * 25) + 5;
             g2.drawString(items.get(i).toString(), textLeft, textTop);
         }
@@ -99,14 +107,6 @@ public class ListView<T extends Object> extends DrawableEntity {
         this.backgroundColor = backgroundColor;
     }
 
-    public Color getLineColor() {
-        return lineColor;
-    }
-
-    public void setLineColor(Color lineColor) {
-        this.lineColor = lineColor;
-    }
-
     public Color getHoverColor() {
         return hoverColor;
     }
@@ -129,6 +129,22 @@ public class ListView<T extends Object> extends DrawableEntity {
 
     public void setForegroundColor(Color foregroundColor) {
         this.foregroundColor = foregroundColor;
+    }
+
+    public Color getAlternateBackgroundColor() {
+        return alternateBackgroundColor;
+    }
+
+    public void setAlternateBackgroundColor(Color alternateBackgroundColor) {
+        this.alternateBackgroundColor = alternateBackgroundColor;
+    }
+
+    public Color getSelectedForegroundColor() {
+        return selectedForegroundColor;
+    }
+
+    public void setSelectedForegroundColor(Color selectedForegroundColor) {
+        this.selectedForegroundColor = selectedForegroundColor;
     }
 
 }
