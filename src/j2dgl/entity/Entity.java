@@ -7,7 +7,6 @@ public abstract class Entity {
 
     public boolean visible = true;
     private boolean disposeLater = false;
-    public boolean drawRequired = false;
 
     public double xIncrement = 0;
     public double yIncrement = 0;

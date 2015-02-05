@@ -8,8 +8,9 @@ import java.awt.image.BufferedImage;
 
 public abstract class DrawableEntity extends Entity implements Renderable {
 
-    private BufferedImage image;
+    private final BufferedImage image;
     private final Graphics2D g2;
+    protected boolean drawRequired = true;
 
     public DrawableEntity(double x, double y, int width, int height) {
         super(x, y, width, height);
@@ -24,8 +25,10 @@ public abstract class DrawableEntity extends Entity implements Renderable {
 
     @Override
     public final BufferedImage getImage() {
-        draw(g2);
-        drawRequired = false;
+        if (drawRequired) {
+            draw(g2);
+        }
+//        drawRequired = false;
         return image;
     }
 

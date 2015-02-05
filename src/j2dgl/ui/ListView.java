@@ -13,23 +13,28 @@ public class ListView<T extends Object> extends UIComponent {
     private T selectedItem = null;
     private int selectedIndex = -1;
     private int hoverIndex = -1;
+    private final Runnable removeAction;
+    private final DeleteItemButton btnDeleteItem;
 
     private Color backgroundColor = new Color(0x1A1A1A);
     private Color alternateBackgroundColor = new Color(0x242424);
     private Color hoverColor = new Color(0x454545);
-    private Color selectedColor = new Color(0xE3E3E3);
+    private Color selectedColor = new Color(0x4AEBFF);
     private Color foregroundColor = Color.WHITE;
-    private Color selectedForegroundColor = Color.BLACK;
+    private Color selectedForegroundColor = new Color(0x4AEBFF);
 
-    public ListView(double x, double y, int width, int height, Point mouse, Boalean mouseDown) {
+    public ListView(double x, double y, int width, int height, Point mouse,
+            Boalean mouseDown, Runnable removeAction) {
         super(x, y, width, height, mouse, mouseDown);
+        this.removeAction = removeAction;
+        btnDeleteItem = new DeleteItemButton(-25, -25, 25, 25, mouse, mouseDown, null, removeAction);
     }
 
     @Override
     protected void draw(Graphics2D g2) {
         drawBackground(g2);
-        drawItems(g2);
         drawBorder(g2);
+        drawItems(g2);
     }
 
     private void drawBackground(Graphics2D g2) {
@@ -48,10 +53,14 @@ public class ListView<T extends Object> extends UIComponent {
         for (int i = 0; i < items.size(); i++) {
             if (i == selectedIndex) {
                 g2.setColor(getSelectedColor());
-                g2.fillRect(1, (i * 25) + 1, width - 2, 25);
+                g2.drawRect(-1, (i * 25) + 1, width, 24);
             } else if (i == hoverIndex) {
                 g2.setColor(getHoverColor());
-                g2.fillRect(1, (i * 25) + 1, width - 2, 25);
+                g2.fillRect(-1, (i * 25) + 1, width + 1, 25);
+            }
+            if (i == hoverIndex) {
+                g2.drawImage(btnDeleteItem.getImage(), null,
+                        width - 25, (i * 25) + 1);
             }
             if (i == selectedIndex) {
                 g2.setColor(getSelectedForegroundColor());
@@ -67,13 +76,16 @@ public class ListView<T extends Object> extends UIComponent {
     @Override
     public void update() {
         if (getBounds().contains(mouse)) {
-            Point localMouse = new Point(mouse.x - (int) Math.round(x), mouse.y - (int) Math.round(y));
             Rectangle currentItemArea;
             for (int i = 0; i < items.size(); i++) {
-                currentItemArea = new Rectangle(i, i * 25, width, 25);
-                if (currentItemArea.contains(localMouse)) {
+                currentItemArea = new Rectangle((int) (i + x), (int) (i * 25 + y), width, 25);
+                if (currentItemArea.contains(mouse)) {
                     hoverIndex = i;
-                    if (mouseDown.getValue()) {
+                    btnDeleteItem.x = currentItemArea.x + width - 25;
+                    btnDeleteItem.y = currentItemArea.y;
+                    btnDeleteItem.update();
+                    if (!btnDeleteItem.getBounds().contains(mouse)
+                            && mouseDown.getValue()) {
                         selectedIndex = i;
                         selectedItem = items.get(selectedIndex);
                     }
@@ -84,7 +96,6 @@ public class ListView<T extends Object> extends UIComponent {
         } else {
             hoverIndex = -1;
         }
-
     }
 
     public void addItem(T item) {
@@ -147,4 +158,12 @@ public class ListView<T extends Object> extends UIComponent {
         this.selectedForegroundColor = selectedForegroundColor;
     }
 
+    private class DeleteItemButton extends DrawnButton {
+
+        public DeleteItemButton(double x, double y, int width, int height, Point mouse,
+                Boalean mouseDown, String text, Runnable runnable) {
+            super(x, y, width, height, mouse, mouseDown, text, runnable);
+        }
+
+    }
 }

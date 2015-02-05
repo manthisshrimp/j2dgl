@@ -54,6 +54,9 @@ public class J2DGLFrame extends javax.swing.JFrame {
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         addMouseMotionListener(new java.awt.event.MouseMotionAdapter() {
+            public void mouseDragged(java.awt.event.MouseEvent evt) {
+                formMouseDragged(evt);
+            }
             public void mouseMoved(java.awt.event.MouseEvent evt) {
                 formMouseMoved(evt);
             }
@@ -139,6 +142,10 @@ public class J2DGLFrame extends javax.swing.JFrame {
     private void formMouseMoved(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_formMouseMoved
         updateMouse(evt);
     }//GEN-LAST:event_formMouseMoved
+
+    private void formMouseDragged(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_formMouseDragged
+        updateMouse(evt);
+    }//GEN-LAST:event_formMouseDragged
 
     private void updateMouse(MouseEvent evt) {
         if (fullscreen) {
