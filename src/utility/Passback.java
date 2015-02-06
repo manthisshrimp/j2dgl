@@ -1,7 +1,11 @@
 package utility;
 
-public interface Passback extends Runnable {
-    
-    public void setPassBackObject(Object object);
-    
+public abstract class Passback implements Runnable {
+
+    protected Object object;
+
+    public void setPassBackObject(Object object) {
+        this.object = object;
+    }
+
 }

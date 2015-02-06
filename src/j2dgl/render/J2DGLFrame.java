@@ -1,6 +1,6 @@
 package j2dgl.render;
 
-import j2dgl.Boalean;
+import utility.Boalean;
 import j2dgl.RenderThread;
 import java.awt.Cursor;
 import java.awt.Dimension;
@@ -14,6 +14,7 @@ import java.awt.Toolkit;
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
+import utility.Passback;
 
 public class J2DGLFrame extends javax.swing.JFrame {
 
@@ -24,6 +25,7 @@ public class J2DGLFrame extends javax.swing.JFrame {
     private final RenderThread renderThread;
     private final Boalean mouseDown;
     private final Runnable exitMethod;
+    private final Passback keyTypedMethod;
     private Insets insets;
     private final Dimension resolution;
     private final Point mouse;
@@ -32,8 +34,9 @@ public class J2DGLFrame extends javax.swing.JFrame {
     private double mouseXCorrection = 1;
     private double mouseYCorrection = 1;
 
-    public J2DGLFrame(ArrayList<Integer> keyQueue, MouseEvent lastMouseEvent, Dimension resolution,
-            RenderThread renderThread, Boalean mouseDown, Runnable exitMethod, Point mouse) throws HeadlessException {
+    public J2DGLFrame(ArrayList<Integer> keyQueue, MouseEvent lastMouseEvent, 
+            Dimension resolution, RenderThread renderThread, Boalean mouseDown, 
+            Runnable exitMethod, Point mouse, Passback keyTypedMethod) throws HeadlessException {
         this.keyQueue = keyQueue;
         this.lastMouseEvent = lastMouseEvent;
         this.renderThread = renderThread;
@@ -41,6 +44,7 @@ public class J2DGLFrame extends javax.swing.JFrame {
         this.exitMethod = exitMethod;
         this.resolution = resolution;
         this.mouse = mouse;
+        this.keyTypedMethod = keyTypedMethod;
 
         setIgnoreRepaint(true);
         setResizable(false);
@@ -88,6 +92,9 @@ public class J2DGLFrame extends javax.swing.JFrame {
             }
             public void keyReleased(java.awt.event.KeyEvent evt) {
                 formKeyReleased(evt);
+            }
+            public void keyTyped(java.awt.event.KeyEvent evt) {
+                formKeyTyped(evt);
             }
         });
 
@@ -146,6 +153,11 @@ public class J2DGLFrame extends javax.swing.JFrame {
     private void formMouseDragged(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_formMouseDragged
         updateMouse(evt);
     }//GEN-LAST:event_formMouseDragged
+
+    private void formKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_formKeyTyped
+        keyTypedMethod.setPassBackObject(evt);
+        keyTypedMethod.run();
+    }//GEN-LAST:event_formKeyTyped
 
     private void updateMouse(MouseEvent evt) {
         if (fullscreen) {

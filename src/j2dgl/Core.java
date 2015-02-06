@@ -1,5 +1,6 @@
 package j2dgl;
 
+import utility.Boalean;
 import j2dgl.entity.Entity;
 import j2dgl.render.J2DGLFrame;
 import java.awt.Color;
@@ -11,6 +12,7 @@ import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import javax.swing.JOptionPane;
+import utility.Passback;
 
 public abstract class Core {
 
@@ -48,7 +50,12 @@ public abstract class Core {
         frame = new J2DGLFrame(keyQueue, lastMouseEvent, resolution, renderThread, mouseDown,
                 () -> {
                     exit();
-                }, mouse);
+                }, mouse, new Passback() {
+                    @Override
+                    public void run() {
+                        keyTyped((KeyEvent) object);
+                    }
+                });
 
         init();
 
@@ -61,12 +68,12 @@ public abstract class Core {
         while (running) {
             beginTime = System.nanoTime();
             coreKeyEvents();
-            keyPressed(keyQueue);
+            keyEvents(keyQueue);
 
             update();
 
             if (lastMouseEvent != null) {
-                mouseDown(lastMouseEvent);
+                mouseEvents(lastMouseEvent);
                 lastMouseEvent = null;
             }
 
@@ -112,7 +119,9 @@ public abstract class Core {
         }
     }
 
-    protected abstract void keyPressed(ArrayList<Integer> keyQueue);
+    protected abstract void keyEvents(ArrayList<Integer> keyQueue);
+
+    protected abstract void keyTyped(KeyEvent keyEvent);
 
     private void coreKeyEvents() {
         if (keyQueue.contains(KeyEvent.VK_0)) {
@@ -130,7 +139,7 @@ public abstract class Core {
         }
     }
 
-    protected abstract void mouseDown(MouseEvent mouseEvent);
+    protected abstract void mouseEvents(MouseEvent mouseEvent);
 
     public boolean isMouseOverEntity(Entity entity) {
         return mouse.x >= entity.x

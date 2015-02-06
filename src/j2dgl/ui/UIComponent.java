@@ -1,6 +1,6 @@
 package j2dgl.ui;
 
-import j2dgl.Boalean;
+import utility.Boalean;
 import j2dgl.entity.DrawableEntity;
 import java.awt.Color;
 import java.awt.Graphics2D;
