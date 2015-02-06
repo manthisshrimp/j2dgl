@@ -13,25 +13,20 @@ public class DrawnButton extends Button {
     }
 
     @Override
-    protected void drawBackground(Graphics2D g2) {
-        if (getBounds().contains(mouse)) {
-            getLabel().setBackground(new Color(0x454545));
-            if (mouseDown.getValue()) {
-                getLabel().setBackground(new Color(0x1A1A1A));
-                labelXOffset = 1;
-                labelYOffset = 1;
-                g2.setColor(Color.BLACK);
-                g2.drawLine(1, 1, 1, height);
-                g2.drawLine(1, 1, width, 1);
-            } else {
-                labelXOffset = 0;
-                labelYOffset = 0;
-            }
-        } else {
-            getLabel().setBackground(new Color(0x242424));
-            labelXOffset = 0;
-            labelYOffset = 0;
-        }
+    protected void mouseHovering(Graphics2D g2) {
+        getLabel().setBackground(new Color(0x454545));
     }
 
+    @Override
+    protected void mouseDown(Graphics2D g2) {
+        g2.setColor(Color.BLACK);
+        g2.drawLine(1, 1, 1, height);
+        g2.drawLine(1, 1, width, 1);
+        getLabel().setBackground(new Color(0x1A1A1A));
+    }
+
+    @Override
+    protected void defaultLook(Graphics2D g2) {
+        getLabel().setBackground(new Color(0x242424));
+    }
 }
