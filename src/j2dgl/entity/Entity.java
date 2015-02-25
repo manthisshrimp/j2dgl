@@ -1,9 +1,10 @@
 package j2dgl.entity;
 
+import j2dgl.update.Updatable;
 import java.awt.Point;
 import java.awt.Rectangle;
 
-public abstract class Entity {
+public abstract class Entity implements Updatable {
 
     public boolean visible = true;
     private boolean disposeLater = false;
@@ -54,6 +55,7 @@ public abstract class Entity {
         y += yIncrement;
     }
 
+    @Override
     public abstract void update();
 
     public boolean intersects(Entity otherEntity) {

@@ -10,7 +10,7 @@ import utility.Passback;
 
 public class ListView<T extends Object> extends UIComponent {
 
-    private final ArrayList<T> items = new ArrayList<>();
+    private ArrayList<T> items = new ArrayList<>();
     private T selectedItem = null;
     private int selectedIndex = -1;
     private int hoverIndex = -1;
@@ -98,8 +98,8 @@ public class ListView<T extends Object> extends UIComponent {
                     hoverIndex = i;
                     btnDeleteItem.x = currentItemArea.x + width - 25;
                     btnDeleteItem.y = currentItemArea.y;
-                    btnDeleteItem.update();
                     removeAction.setPassBackObject(items.get(hoverIndex));
+                    btnDeleteItem.update();
                     if (!btnDeleteItem.getBounds().contains(mouse)
                             && mouseDown.getValue()) {
                         selectedIndex = i;
@@ -120,6 +120,10 @@ public class ListView<T extends Object> extends UIComponent {
 
     public void removeItem(T item) {
         items.remove(item);
+    }
+
+    public void setItems(ArrayList<T> items) {
+        this.items = items;
     }
 
     public T getSelectedItem() {
