@@ -12,6 +12,7 @@ import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import javax.swing.JOptionPane;
+import javax.xml.ws.Holder;
 import utility.Passback;
 
 public abstract class Core {
@@ -20,7 +21,7 @@ public abstract class Core {
     protected int updateRate = 60;
     public int scrollChange = 0;
     // Core Objects
-    protected MouseEvent lastMouseEvent;
+    protected final Holder<MouseEvent> lastMouseEvent = new Holder<>();
     protected J2DGLFrame frame;
     public RenderThread renderThread;
     protected Dimension resolution;
@@ -68,13 +69,13 @@ public abstract class Core {
         while (running) {
             beginTime = System.nanoTime();
             coreKeyEvents();
-            keyEvents(keyQueue);
+            keysPressed(keyQueue);
 
             update();
 
-            if (lastMouseEvent != null) {
-                mouseEvents(lastMouseEvent);
-                lastMouseEvent = null;
+            if (lastMouseEvent.value != null) {
+                processMouse(lastMouseEvent.value);
+                lastMouseEvent.value = null;
             }
 
             timeTaken = System.nanoTime() - beginTime;
@@ -98,6 +99,16 @@ public abstract class Core {
     protected abstract void update();
 
     protected abstract void draw(Graphics2D g2);
+    
+    // For processing currently pressed keys.
+    protected abstract void keysPressed(ArrayList<Integer> keyQueue);
+
+    // Direct hook to keyTyped in frame.
+    protected abstract void keyTyped(KeyEvent keyEvent);
+    
+    protected abstract void processMouse(MouseEvent mouseEvent);
+    
+    protected abstract void beforeClose();
 
     public void drawDebug(Graphics2D g2) {
         g2.setColor(Color.BLACK);
@@ -119,10 +130,6 @@ public abstract class Core {
         }
     }
 
-    protected abstract void keyEvents(ArrayList<Integer> keyQueue);
-
-    protected abstract void keyTyped(KeyEvent keyEvent);
-
     private void coreKeyEvents() {
         if (keyQueue.contains(KeyEvent.VK_0)) {
             showDebug = !showDebug;
@@ -139,16 +146,12 @@ public abstract class Core {
         }
     }
 
-    protected abstract void mouseEvents(MouseEvent mouseEvent);
-
     public boolean isMouseOverEntity(Entity entity) {
         return mouse.x >= entity.x
                 && mouse.x <= entity.x + entity.width
                 && mouse.y >= entity.y
                 && mouse.y <= entity.y + entity.height;
     }
-
-    protected abstract void beforeClose();
 
     public void exit() {
         running = false;

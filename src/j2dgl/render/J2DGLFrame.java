@@ -4,7 +4,6 @@ import utility.Boalean;
 import j2dgl.RenderThread;
 import java.awt.Cursor;
 import java.awt.Dimension;
-import java.awt.Graphics;
 import java.awt.GraphicsDevice;
 import java.awt.GraphicsEnvironment;
 import java.awt.HeadlessException;
@@ -15,13 +14,14 @@ import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import utility.Passback;
+import javax.xml.ws.Holder;
 
 public class J2DGLFrame extends javax.swing.JFrame {
 
     private final GraphicsDevice screenDevice = GraphicsEnvironment
             .getLocalGraphicsEnvironment().getDefaultScreenDevice();
     private ArrayList<Integer> keyQueue;
-    private MouseEvent lastMouseEvent;
+    private final Holder<MouseEvent> lastMouseEvent;
     private final RenderThread renderThread;
     private final Boalean mouseDown;
     private final Runnable exitMethod;
@@ -34,7 +34,7 @@ public class J2DGLFrame extends javax.swing.JFrame {
     private double mouseXCorrection = 1;
     private double mouseYCorrection = 1;
 
-    public J2DGLFrame(ArrayList<Integer> keyQueue, MouseEvent lastMouseEvent, 
+    public J2DGLFrame(ArrayList<Integer> keyQueue, Holder<MouseEvent> lastMouseEvent, 
             Dimension resolution, RenderThread renderThread, Boalean mouseDown, 
             Runnable exitMethod, Point mouse, Passback keyTypedMethod) throws HeadlessException {
         this.keyQueue = keyQueue;
@@ -129,17 +129,17 @@ public class J2DGLFrame extends javax.swing.JFrame {
     }//GEN-LAST:event_formWindowClosed
 
     private void formMousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_formMousePressed
-        lastMouseEvent = evt;
+        lastMouseEvent.value = evt;
         mouseDown.setValue(true);
     }//GEN-LAST:event_formMousePressed
 
     private void formMouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_formMouseReleased
-        lastMouseEvent = evt;
+        lastMouseEvent.value = evt;
         mouseDown.setValue(false);
     }//GEN-LAST:event_formMouseReleased
 
     private void formMouseWheelMoved(java.awt.event.MouseWheelEvent evt) {//GEN-FIRST:event_formMouseWheelMoved
-        lastMouseEvent = evt;
+        lastMouseEvent.value = evt;
     }//GEN-LAST:event_formMouseWheelMoved
 
     private void formWindowClosing(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowClosing
