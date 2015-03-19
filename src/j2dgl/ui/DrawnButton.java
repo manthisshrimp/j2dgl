@@ -1,6 +1,6 @@
 package j2dgl.ui;
 
-import utility.Boalean;
+import utility.BooleanHolder;
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.Point;
@@ -8,7 +8,7 @@ import java.awt.Point;
 public class DrawnButton extends Button {
 
     public DrawnButton(double x, double y, int width, int height, Point mouse,
-            Boalean mouseDown, String text, Runnable runnable) {
+            BooleanHolder mouseDown, String text, Runnable runnable) {
         super(x, y, width, height, mouse, mouseDown, text, true, runnable);
     }
 

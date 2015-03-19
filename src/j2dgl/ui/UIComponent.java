@@ -1,6 +1,6 @@
 package j2dgl.ui;
 
-import utility.Boalean;
+import utility.BooleanHolder;
 import j2dgl.entity.DrawableEntity;
 import java.awt.Color;
 import java.awt.Graphics2D;
@@ -9,10 +9,10 @@ import java.awt.Point;
 public abstract class UIComponent extends DrawableEntity {
 
     protected final Point mouse;
-    protected final Boalean mouseDown;
+    protected final BooleanHolder mouseDown;
     private Color borderColor = Color.DARK_GRAY;
 
-    public UIComponent(double x, double y, int width, int height, Point mouse, Boalean mouseDown) {
+    public UIComponent(double x, double y, int width, int height, Point mouse, BooleanHolder mouseDown) {
         super(x, y, width, height);
         this.mouse = mouse;
         this.mouseDown = mouseDown;

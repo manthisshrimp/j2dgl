@@ -1,6 +1,6 @@
 package j2dgl;
 
-import utility.Boalean;
+import utility.BooleanHolder;
 import j2dgl.entity.Entity;
 import j2dgl.render.J2DGLFrame;
 import java.awt.Color;
@@ -23,13 +23,13 @@ public abstract class Core {
     // Core Objects
     protected final Holder<MouseEvent> lastMouseEvent = new Holder<>();
     protected J2DGLFrame frame;
-    public RenderThread renderThread;
+    private RenderThread renderThread;
     protected Dimension resolution;
     private final ArrayList<Integer> keyQueue = new ArrayList<>();
-    protected Point mouse = new Point(-1, -1);
+    private Point mouse = new Point(-1, -1);
     // Core Flags
     private boolean clickDisabled = false;
-    protected Boalean mouseDown = new Boalean(false);
+    protected BooleanHolder mouseDown = new BooleanHolder(false);
 
     public void forceMouseButtonState(boolean isDown) {
         mouseDown.setValue(isDown);

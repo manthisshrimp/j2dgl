@@ -1,6 +1,6 @@
 package j2dgl.ui;
 
-import utility.Boalean;
+import utility.BooleanHolder;
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.Point;
@@ -14,7 +14,7 @@ public abstract class Button extends UIComponent {
     private boolean waitingForRealease = false;
     private Color background;
 
-    public Button(double x, double y, int width, int height, Point mouse, Boalean mouseDown, 
+    public Button(double x, double y, int width, int height, Point mouse, BooleanHolder mouseDown, 
             String text, boolean labeled, Runnable runnable) {
         super(x, y, width, height, mouse, mouseDown);
         this.runnable = runnable;

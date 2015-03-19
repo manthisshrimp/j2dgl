@@ -1,10 +1,10 @@
 package utility;
 
-public class Boalean {
+public class BooleanHolder {
     
     private boolean value;
 
-    public Boalean(boolean value) {
+    public BooleanHolder(boolean value) {
         this.value = value;
     }
 

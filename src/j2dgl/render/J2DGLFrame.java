@@ -1,6 +1,6 @@
 package j2dgl.render;
 
-import utility.Boalean;
+import utility.BooleanHolder;
 import j2dgl.RenderThread;
 import java.awt.Cursor;
 import java.awt.Dimension;
@@ -20,10 +20,10 @@ public class J2DGLFrame extends javax.swing.JFrame {
 
     private final GraphicsDevice screenDevice = GraphicsEnvironment
             .getLocalGraphicsEnvironment().getDefaultScreenDevice();
-    private ArrayList<Integer> keyQueue;
+    private final ArrayList<Integer> keyQueue;
     private final Holder<MouseEvent> lastMouseEvent;
     private final RenderThread renderThread;
-    private final Boalean mouseDown;
+    private final BooleanHolder mouseDown;
     private final Runnable exitMethod;
     private final Passback keyTypedMethod;
     private Insets insets;
@@ -35,7 +35,7 @@ public class J2DGLFrame extends javax.swing.JFrame {
     private double mouseYCorrection = 1;
 
     public J2DGLFrame(ArrayList<Integer> keyQueue, Holder<MouseEvent> lastMouseEvent, 
-            Dimension resolution, RenderThread renderThread, Boalean mouseDown, 
+            Dimension resolution, RenderThread renderThread, BooleanHolder mouseDown, 
             Runnable exitMethod, Point mouse, Passback keyTypedMethod) throws HeadlessException {
         this.keyQueue = keyQueue;
         this.lastMouseEvent = lastMouseEvent;
@@ -184,6 +184,7 @@ public class J2DGLFrame extends javax.swing.JFrame {
             mouseXCorrection = resolution.width * 1D / getWidth();
             mouseYCorrection = resolution.height * 1D / getHeight();
             renderThread.enableRendering(getBufferStrategy(), insets);
+            requestFocus();
         } else {
             renderThread.disableRendering();
             setVisible(false);
@@ -196,11 +197,12 @@ public class J2DGLFrame extends javax.swing.JFrame {
             mouseXCorrection = 1;
             mouseYCorrection = 1;
             renderThread.enableRendering(getBufferStrategy(), insets);
+            requestFocus();
         }
         java.awt.EventQueue.invokeLater(() -> {
             toFront();
         });
-        keyQueue = new ArrayList<>();
+        keyQueue.clear();
     }
 
     public void setMouseVisible(boolean mouseVisible) {

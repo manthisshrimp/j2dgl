@@ -3,16 +3,16 @@ package j2dgl.ui;
 import j2dgl.render.Renderer;
 import j2dgl.update.Updater;
 import java.awt.Point;
-import utility.Boalean;
+import utility.BooleanHolder;
 
 public abstract class Controller {
     
     protected final Updater updater;
     protected final Renderer renderer;
     protected final Point mouse;
-    protected final Boalean mouseDown;
+    protected final BooleanHolder mouseDown;
 
-    public Controller(Updater updater, Renderer renderer, Point mouse, Boalean mouseDown) {
+    public Controller(Updater updater, Renderer renderer, Point mouse, BooleanHolder mouseDown) {
         this.updater = updater;
         this.renderer = renderer;
         this.mouse = mouse;

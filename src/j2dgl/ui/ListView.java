@@ -1,6 +1,6 @@
 package j2dgl.ui;
 
-import utility.Boalean;
+import utility.BooleanHolder;
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.Point;
@@ -26,7 +26,7 @@ public class ListView<T extends Object> extends UIComponent {
     private Color selectedForegroundColor = new Color(0x4AEBFF);
 
     public ListView(double x, double y, int width, int height, Point mouse,
-            Boalean mouseDown, Passback removeAction) {
+            BooleanHolder mouseDown, Passback removeAction) {
         super(x, y, width, height, mouse, mouseDown);
         this.removeAction = removeAction;
         btnDeleteItem = new DeleteItemButton(-25, -25, 23, 23, mouse, mouseDown, null, removeAction);
@@ -191,7 +191,7 @@ public class ListView<T extends Object> extends UIComponent {
         private boolean overSelected = false;
 
         public DeleteItemButton(double x, double y, int width, int height, Point mouse,
-                Boalean mouseDown, String text, Runnable runnable) {
+                BooleanHolder mouseDown, String text, Runnable runnable) {
             super(x, y, width, height, mouse, mouseDown, text, false, runnable);
         }
 

@@ -1,6 +1,6 @@
 package j2dgl.ui;
 
-import utility.Boalean;
+import utility.BooleanHolder;
 import java.awt.Color;
 import java.awt.FontMetrics;
 import java.awt.Graphics2D;
@@ -13,7 +13,7 @@ public class Label extends UIComponent {
     private Color background = Color.GRAY;
     private boolean centerText = false;
 
-    public Label(double x, double y, int width, int height, String text, Point mouse, Boalean mouseDown) {
+    public Label(double x, double y, int width, int height, String text, Point mouse, BooleanHolder mouseDown) {
         super(x, y, width, height, mouse, mouseDown);
         this.text = text;
     }
