@@ -18,10 +18,10 @@ import utility.Passback;
 public abstract class Core {
 
     // Core Variables
-    protected int updateRate = 60;
-    public int scrollChange = 0;
+    private int updateRate = 60;
+    private int scrollChange = 0;
     // Core Objects
-    protected final Holder<MouseEvent> lastMouseEvent = new Holder<>();
+    private final Holder<MouseEvent> lastMouseEvent = new Holder<>();
     protected J2DGLFrame frame;
     private RenderThread renderThread;
     protected Dimension resolution;
@@ -29,7 +29,7 @@ public abstract class Core {
     private Point mouse = new Point(-1, -1);
     // Core Flags
     private boolean clickDisabled = false;
-    protected BooleanHolder mouseDown = new BooleanHolder(false);
+    private BooleanHolder mouseDown = new BooleanHolder(false);
 
     public void forceMouseButtonState(boolean isDown) {
         mouseDown.setValue(isDown);
@@ -91,6 +91,7 @@ public abstract class Core {
                 mouseDown.setValue(false);
                 clickDisabled = false;
             }
+//            renderThread.enableRendering(frame.getBufferStrategy(), frame.getInsets());
         }
         beforeClose();
         System.exit(0);

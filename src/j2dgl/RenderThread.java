@@ -12,12 +12,12 @@ public class RenderThread extends Thread {
     private int fps;
     private long iteration = 0;
     private BufferStrategy buffer;
-    private final Core coreRef;
+    private final Core core;
     private boolean rendering = true;
     private Insets insets;
 
     public RenderThread(Core core) {
-        this.coreRef = core;
+        this.core = core;
     }
 
     @Override
@@ -25,31 +25,30 @@ public class RenderThread extends Thread {
         timeBeginLoop = System.nanoTime();
         while (true) {
             try {
-                iteration++;
-                if ((iteration % 15) == 0) {
-                    fps = (int) ((1 / ((float) (System.nanoTime() - timeBeginLoop))) * 1000000000);
-                }
-                timeBeginLoop = System.nanoTime();
-
                 if (rendering && buffer != null) {
+                    iteration++;
+                    if ((iteration % 15) == 0) {
+                        fps = (int) ((1 / ((float) (System.nanoTime() - timeBeginLoop))) * 1000000000);
+                    }
+                    timeBeginLoop = System.nanoTime();
 
                     g2 = (Graphics2D) buffer.getDrawGraphics();
 
-                    if (coreRef.fullScreen) {
-                        double inWidth = coreRef.resolution.width;
-                        double ratio = coreRef.frame.getWidth() / inWidth;
+                    if (core.fullScreen) {
+                        double inWidth = core.resolution.width;
+                        double ratio = core.frame.getWidth() / inWidth;
                         g2.scale(ratio, ratio);
                     } else {
                         g2.translate(insets.left, insets.top);
                     }
 
                     g2.setColor(Color.black);
-                    g2.fillRect(0, 0, coreRef.resolution.width, coreRef.resolution.height);
+                    g2.fillRect(0, 0, core.resolution.width, core.resolution.height);
 
-                    coreRef.draw(g2);
+                    core.draw(g2);
 
-                    if (coreRef.showDebug) {
-                        coreRef.drawDebug(g2);
+                    if (core.showDebug) {
+                        core.drawDebug(g2);
                         g2.setColor(Color.GREEN);
                         g2.drawString(String.valueOf(fps), 5, 15);
                     }
@@ -59,13 +58,14 @@ public class RenderThread extends Thread {
                     } else {
                         System.out.println("Buffer contents lost");
                     }
+//                    rendering = false;
                 }
 
-                try {
-                    Thread.sleep(4);
-                } catch (InterruptedException e) {
-                    System.out.println("RenderThread woke up.");
-                }
+//                try {
+//                    Thread.sleep(4);
+//                } catch (InterruptedException e) {
+//                    System.out.println("RenderThread woke up.");
+//                }
             } catch (NullPointerException ex) {
 //                 Try to go on...
             } finally {
