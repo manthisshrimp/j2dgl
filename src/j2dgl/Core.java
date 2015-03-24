@@ -142,9 +142,9 @@ public abstract class Core {
             frame.setFullscreen(fullScreen);
             keyQueue.remove((Integer) KeyEvent.VK_F);
         }
-        if (keyQueue.contains(KeyEvent.VK_ESCAPE)) {
-            exit();
-        }
+//        if (keyQueue.contains(KeyEvent.VK_ESCAPE)) {
+//            exit();
+//        }
     }
 
     public boolean isMouseOverEntity(Entity entity) {
