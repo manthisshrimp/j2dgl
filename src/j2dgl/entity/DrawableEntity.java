@@ -8,17 +8,13 @@ import java.awt.image.BufferedImage;
 
 public abstract class DrawableEntity extends Entity implements Renderable {
 
-    private final BufferedImage image;
-    private final Graphics2D g2;
+    private BufferedImage image;
+    private Graphics2D g2;
     protected boolean drawRequired = true;
 
     public DrawableEntity(double x, double y, int width, int height) {
         super(x, y, width, height);
-
-        image = new BufferedImage(width, height, BufferedImage.SCALE_FAST);
-        g2 = (Graphics2D) image.getGraphics();
-        g2.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING,
-                RenderingHints.VALUE_TEXT_ANTIALIAS_LCD_HRGB);
+        initializeGraphics();
     }
 
     protected abstract void draw(Graphics2D g2);
@@ -35,5 +31,12 @@ public abstract class DrawableEntity extends Entity implements Renderable {
     @Override
     public Point getLocation() {
         return super.getLocation();
+    }
+    
+    public final void initializeGraphics() {
+        image = new BufferedImage(width, height, BufferedImage.SCALE_FAST);
+        g2 = (Graphics2D) image.getGraphics();
+        g2.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING,
+                RenderingHints.VALUE_TEXT_ANTIALIAS_LCD_HRGB);
     }
 }

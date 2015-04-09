@@ -3,6 +3,7 @@ package j2dgl.render;
 import java.awt.Graphics2D;
 import java.awt.Point;
 import java.util.ArrayList;
+import java.util.Arrays;
 
 public class Renderer {
 
@@ -17,6 +18,10 @@ public class Renderer {
 
     public void addRenderable(Renderable renderable) {
         renderables.add(renderable);
+    }
+
+    public void addRenderables(Renderable... renderables) {
+        this.renderables.addAll(Arrays.asList(renderables));
     }
 
     public ArrayList<Renderable> getRenderables() {

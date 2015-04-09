@@ -1,23 +1,32 @@
 package j2dgl.update;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
-public class Updater {
+public class Updater<T extends Updatable> {
 
-    private final List<Updatable> updatables = new ArrayList<>();
+    protected final List<T> updatables = new ArrayList<>();
 
-    public void updateAll() {
+    public final void updateAll() {
         updatables.stream().forEach((updatable) -> {
-            updatable.update();
+            executeUpdate(updatable);
         });
     }
 
-    public void addUpdatable(Updatable updatable) {
+    protected void executeUpdate(T updatable) {
+        updatable.update();
+    }
+
+    public void addUpdatable(T updatable) {
         updatables.add(updatable);
     }
 
-    public List<Updatable> getUpdatables() {
+    public void addUpdatables(T... updatables) {
+        this.updatables.addAll(Arrays.asList(updatables));
+    }
+
+    public List<T> getUpdatables() {
         return updatables;
     }
 

@@ -60,7 +60,6 @@ public class RenderThread extends Thread {
                     }
 //                    rendering = false;
                 }
-
 //                try {
 //                    Thread.sleep(4);
 //                } catch (InterruptedException e) {

@@ -19,6 +19,7 @@ public abstract class Core {
 
     // Core Variables
     private int updateRate = 60;
+    private long sleepTime = 0;
     private int scrollChange = 0;
     // Core Objects
     private final Holder<MouseEvent> lastMouseEvent = new Holder<>();
@@ -26,10 +27,10 @@ public abstract class Core {
     private RenderThread renderThread;
     protected Dimension resolution;
     private final ArrayList<Integer> keyQueue = new ArrayList<>();
-    private Point mouse = new Point(-1, -1);
+    protected Point mouse = new Point(-1, -1);
     // Core Flags
     private boolean clickDisabled = false;
-    private BooleanHolder mouseDown = new BooleanHolder(false);
+    protected BooleanHolder mouseDown = new BooleanHolder(false);
 
     public void forceMouseButtonState(boolean isDown) {
         mouseDown.setValue(isDown);
@@ -64,7 +65,6 @@ public abstract class Core {
 
         long beginTime;
         long timeTaken;
-        long sleepTime;
 
         while (running) {
             beginTime = System.nanoTime();
@@ -123,6 +123,7 @@ public abstract class Core {
         g2.drawString("Mouse Y: " + mouse.y, 8, 80);
         g2.drawString("Mouse Down: " + mouseDown.getValue(), 8, 100);
         g2.drawString("Scroll Amount: " + scrollChange, 8, 120);
+        g2.drawString("SleepTime: " + sleepTime + "ms", 8, 140);
 
         if (keyQueue.size() > 0) {
             String keys = "";
