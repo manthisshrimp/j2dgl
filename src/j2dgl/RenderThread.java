@@ -35,7 +35,7 @@ public class RenderThread extends Thread {
                     g2 = (Graphics2D) buffer.getDrawGraphics();
 
                     if (core.fullScreen) {
-                        double inWidth = core.resolution.width;
+                        double inWidth = core.getResolution().width;
                         double ratio = core.frame.getWidth() / inWidth;
                         g2.scale(ratio, ratio);
                     } else {
@@ -43,7 +43,7 @@ public class RenderThread extends Thread {
                     }
 
                     g2.setColor(Color.black);
-                    g2.fillRect(0, 0, core.resolution.width, core.resolution.height);
+                    g2.fillRect(0, 0, core.getResolution().width, core.getResolution().height);
 
                     core.draw(g2);
 

@@ -25,7 +25,7 @@ public abstract class Core {
     private final Holder<MouseEvent> lastMouseEvent = new Holder<>();
     protected J2DGLFrame frame;
     private RenderThread renderThread;
-    protected Dimension resolution;
+    private Dimension resolution;
     private final ArrayList<Integer> keyQueue = new ArrayList<>();
     protected Point mouse = new Point(-1, -1);
     // Core Flags
@@ -49,7 +49,7 @@ public abstract class Core {
 
     public final void startLoop() {
         renderThread = new RenderThread(this);
-        frame = new J2DGLFrame(keyQueue, lastMouseEvent, resolution, renderThread, mouseDown,
+        frame = new J2DGLFrame(keyQueue, lastMouseEvent, getResolution(), renderThread, mouseDown,
                 () -> {
                     exit();
                 }, mouse, new Passback() {
@@ -113,7 +113,7 @@ public abstract class Core {
 
     public void drawDebug(Graphics2D g2) {
         g2.setColor(Color.BLACK);
-        g2.fillRect(0, 0, 160, resolution.height);
+        g2.fillRect(0, 0, 160, getResolution().height);
         g2.setColor(Color.WHITE);
         g2.setFont(new Font("Serif", Font.BOLD, 14));
         g2.drawString("Update Rate: " + updateRate, 8, 40);
@@ -168,5 +168,9 @@ public abstract class Core {
 
     public void disableClick() {
         this.clickDisabled = true;
+    }
+
+    public Dimension getResolution() {
+        return resolution;
     }
 }

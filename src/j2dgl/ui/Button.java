@@ -5,44 +5,36 @@ import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.Point;
 
-public abstract class Button extends UIComponent {
+public class Button extends UIComponent {
 
     private Label label;
-    protected int labelXOffset = 0;
-    protected int labelYOffset = 0;
     private final Runnable runnable;
     private boolean waitingForRealease = false;
-    private Color background;
+    
+    protected int labelXOffset = 0;
+    protected int labelYOffset = 0;
+    
+    public Color bgHoverColor = new Color(0x454545);
+    public Color bgMouseDownColor = new Color(0x1A1A1A);
 
-    public Button(double x, double y, int width, int height, Point mouse, BooleanHolder mouseDown, 
-            String text, boolean labeled, Runnable runnable) {
+    public Button(double x, double y, int width, int height, Point mouse, BooleanHolder mouseDown,
+            String text, Runnable runnable) {
         super(x, y, width, height, mouse, mouseDown);
         this.runnable = runnable;
-        if (labeled) {
+        if (text != null) {
             label = new Label(0, 0, width, height, text, mouse, mouseDown);
-            label.setBackground(null);
-            label.setCenterText(true);
         }
+        backgroundColor = new Color(0x242424);
     }
 
     @Override
     protected void draw(Graphics2D g2) {
         drawBackground(g2);
-        if (label != null) {
-            g2.drawImage(getLabel().getImage(), null, labelXOffset, labelYOffset);
-        }
         drawBorder(g2);
-    }
-
-    protected void drawBackground(Graphics2D g2) {
-        if (getBackground() != null) {
-            g2.setColor(getBackground());
-            g2.fillRect(0, 0, width, height);
-        }
         if (getBounds().contains(mouse)) {
-            mouseHovering(g2);
+            setMouseHoverLook(g2);
             if (mouseDown.getValue()) {
-                mouseDown(g2);
+                setMouseDownLook(g2);
                 labelXOffset = 1;
                 labelYOffset = 1;
             } else {
@@ -50,17 +42,29 @@ public abstract class Button extends UIComponent {
                 labelYOffset = 0;
             }
         } else {
-            defaultLook(g2);
+            setDefaultLook(g2);
             labelXOffset = 0;
             labelYOffset = 0;
         }
+        if (label != null) {
+            g2.drawImage(getLabel().getImage(), null, labelXOffset, labelYOffset);
+        }
     }
-    
-    protected abstract void mouseHovering(Graphics2D g2);
-    
-    protected abstract void mouseDown(Graphics2D g2);
-    
-    protected abstract void defaultLook(Graphics2D g2);
+
+    protected void setMouseHoverLook(Graphics2D g2) {
+        label.backgroundColor = bgHoverColor;
+    }
+
+    protected void setMouseDownLook(Graphics2D g2) {
+        g2.setColor(Color.BLACK);
+        g2.drawLine(1, 1, 1, height);
+        g2.drawLine(1, 1, width, 1);
+        label.backgroundColor = bgMouseDownColor;
+    }
+
+    protected void setDefaultLook(Graphics2D g2) {
+        label.backgroundColor = backgroundColor;
+    }
 
     @Override
     public void update() {
@@ -79,17 +83,5 @@ public abstract class Button extends UIComponent {
 
     public Label getLabel() {
         return label;
-    }
-
-    public void setLabel(Label label) {
-        this.label = label;
-    }
-
-    public Color getBackground() {
-        return background;
-    }
-
-    public void setBackground(Color background) {
-        this.background = background;
     }
 }

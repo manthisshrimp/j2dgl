@@ -12,10 +12,15 @@ public class Updater<T extends Updatable> {
         updatables.stream().forEach((updatable) -> {
             executeUpdate(updatable);
         });
+        postUpdate();
     }
 
     protected void executeUpdate(T updatable) {
         updatable.update();
+    }
+    
+    protected void postUpdate() {
+        
     }
 
     public void addUpdatable(T updatable) {
