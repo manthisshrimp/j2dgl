@@ -1,9 +1,8 @@
 package j2dgl.ui;
 
-import utility.BooleanHolder;
+import j2dgl.InputHandler;
 import java.awt.Color;
 import java.awt.Graphics2D;
-import java.awt.Point;
 import java.awt.Rectangle;
 import java.util.ArrayList;
 import utility.Passback;
@@ -24,17 +23,16 @@ public class ListView<T extends Object> extends UIComponent {
     public Color foregroundColor = Color.WHITE;
     public Color selectedFGColor = new Color(0x4AEBFF);
 
-    public ListView(double x, double y, int width, int height, Point mouse,
-            BooleanHolder mouseDown, Passback removeAction) {
-        super(x, y, width, height, mouse, mouseDown);
+    public ListView(double x, double y, int width, int height, InputHandler inputHandler, Passback removeAction) {
+        super(x, y, width, height, inputHandler);
         this.removeAction = removeAction;
-        btnDeleteItem = new DeleteItemButton(-25, -25, 23, 23, mouse, mouseDown, null, removeAction);
+        btnDeleteItem = new DeleteItemButton(-25, -25, 23, 23, inputHandler, null, removeAction);
         btnDeleteItem.borderColor = hoverColor;
         btnDeleteItem.backgroundColor = hoverColor;
     }
 
     @Override
-    protected void draw(Graphics2D g2) {
+    public void drawSelf(Graphics2D g2) {
         drawBackground(g2);
         drawBorder(g2);
         drawItems(g2);
@@ -74,8 +72,8 @@ public class ListView<T extends Object> extends UIComponent {
                     btnDeleteItem.backgroundColor = hoverColor;
                     btnDeleteItem.overSelected = false;
                 }
-                g2.drawImage(btnDeleteItem.getImage(), null,
-                        width - 24, (i * 25) + 2);
+//                g2.drawImage(btnDeleteItem.getImage(), null,
+//                        width - 24, (i * 25) + 2);
             }
             if (i == selectedIndex) {
                 g2.setColor(selectedFGColor);
@@ -89,19 +87,19 @@ public class ListView<T extends Object> extends UIComponent {
     }
 
     @Override
-    public void update() {
-        if (getBounds().contains(mouse)) {
+    protected void applyLogic() {
+        if (getBounds().contains(inputHandler.getMouse())) {
             Rectangle currentItemArea;
             for (int i = 0; i < items.size(); i++) {
                 currentItemArea = new Rectangle((int) (i + x), (int) (i * 25 + y), width, 25);
-                if (currentItemArea.contains(mouse)) {
+                if (currentItemArea.contains(inputHandler.getMouse())) {
                     hoverIndex = i;
                     btnDeleteItem.x = currentItemArea.x + width - 25;
                     btnDeleteItem.y = currentItemArea.y;
                     removeAction.setPassBackObject(items.get(hoverIndex));
                     btnDeleteItem.update();
-                    if (!btnDeleteItem.getBounds().contains(mouse)
-                            && mouseDown.getValue()) {
+                    if (!btnDeleteItem.getBounds().contains(inputHandler.getMouse())
+                            && inputHandler.isMouseDown()) {
                         selectedIndex = i;
                         selectedItem = items.get(selectedIndex);
                     }
@@ -134,13 +132,13 @@ public class ListView<T extends Object> extends UIComponent {
 
         boolean overSelected = false;
 
-        public DeleteItemButton(double x, double y, int width, int height, Point mouse,
-                BooleanHolder mouseDown, String text, Runnable runnable) {
-            super(x, y, width, height, mouse, mouseDown, text, runnable);
+        public DeleteItemButton(double x, double y, int width, int height, 
+                InputHandler inputHandler, String text, Runnable runnable) {
+            super(x, y, width, height, inputHandler, text, runnable);
         }
 
         @Override
-        protected void setMouseHoverLook(Graphics2D g2) {
+        protected void drawMouseHoverLook(Graphics2D g2) {
             g2.setColor(new Color(0xFC2D3B));
             g2.fillRect(6, 6, 12, 12);
             g2.setColor(new Color(0xE0E0E0));
@@ -151,7 +149,7 @@ public class ListView<T extends Object> extends UIComponent {
         }
 
         @Override
-        protected void setMouseDownLook(Graphics2D g2) {
+        protected void drawMouseDownLook(Graphics2D g2) {
             g2.setColor(new Color(0xBA232D));
             g2.fillRect(6, 6, 12, 12);
             g2.setColor(new Color(0xE0E0E0));
@@ -164,7 +162,7 @@ public class ListView<T extends Object> extends UIComponent {
         }
 
         @Override
-        protected void setDefaultLook(Graphics2D g2) {
+        protected void drawDefaultLook(Graphics2D g2) {
             if (overSelected) {
                 g2.setColor(hoverColor);
             } else {

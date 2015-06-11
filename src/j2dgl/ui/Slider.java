@@ -1,10 +1,10 @@
 package j2dgl.ui;
 
+import j2dgl.InputHandler;
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.Rectangle;
-import utility.BooleanHolder;
 
 public class Slider extends UIComponent {
 
@@ -23,9 +23,9 @@ public class Slider extends UIComponent {
     public Color foregroundColor = new Color(0x4AEBFF);
     public Color lineColor = Color.WHITE;
 
-    public Slider(double x, double y, int width, int height, Point mouse,
-            BooleanHolder mouseDown, int minValue, int maxValue, int initialValue) {
-        super(x, y, width, height, mouse, mouseDown);
+    public Slider(double x, double y, int width, int height, InputHandler inputHandler,
+            int minValue, int maxValue, int initialValue) {
+        super(x, y, width, height, inputHandler);
         this.minValue = minValue;
         this.maxValue = maxValue;
         this.value = initialValue;
@@ -34,7 +34,7 @@ public class Slider extends UIComponent {
         grabber = new Rectangle((int) x + sidePadding, (int) (height - GRABBER_SIZE - 3 + y), GRABBER_SIZE, GRABBER_SIZE);
         setValue(value);
         // The value label's coordinates are in local space.
-        valueLabel = new Label((int) (grabber.x - x), -6, "" + minValue, mouse, mouseDown);
+        valueLabel = new Label((int) (grabber.x - x), -6, "" + minValue, null, inputHandler);
         valueLabel.foregroundColor = foregroundColor;
         valueLabel.backgroundColor = Color.BLACK;
         valueLabel.centerTextX = true;
@@ -44,7 +44,7 @@ public class Slider extends UIComponent {
     }
 
     @Override
-    protected void draw(Graphics2D g2) {
+    public void drawSelf(Graphics2D g2) {
         drawBackground(g2);
         drawBorder(g2);
         // Draw the line
@@ -55,8 +55,8 @@ public class Slider extends UIComponent {
         g2.drawRect((int) (grabber.x - x), (int) (grabber.y - y), grabber.width, grabber.height);
         g2.drawLine((int) (grabber.x - x + grabber.width / 2), (int) (grabber.y - y),
                 (int) (grabber.x - x + grabber.width / 2), (int) (grabber.y - y - (grabber.y - y - height / 2) * 2) + 3);
-        if (grabber.contains(mouse)) {
-            if (mouseDown.getValue()) {
+        if (grabber.contains(inputHandler.getMouse())) {
+            if (inputHandler.isMouseDown()) {
                 g2.setColor(Color.DARK_GRAY);
             } else {
                 g2.setColor(lineColor);
@@ -65,12 +65,14 @@ public class Slider extends UIComponent {
         }
         // Draw the label
         int drawX = (int) (grabber.x - x + grabber.width / 2 - valueLabel.width / 2);
-        g2.drawImage(valueLabel.getImage(), null, drawX, (int) valueLabel.y);
+//        g2.drawImage(valueLabel.getImage(), null, drawX, (int) valueLabel.y);
+//        valueLabel.draw(g2, drawX, height);
     }
 
     @Override
-    public void update() {
-        if (mouseDown.getValue()) {
+    protected void applyLogic() {
+        Point mouse = inputHandler.getMouse();
+        if (inputHandler.isMouseDown()) {
             if (mouse.x > x + sidePadding + 3 && mouse.x < x + width - sidePadding - 4) {
                 if (this.getBounds().contains(mouse)) {
                     calculateNewValue(mouse.x);

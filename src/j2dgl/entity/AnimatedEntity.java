@@ -1,11 +1,10 @@
 package j2dgl.entity;
 
-import j2dgl.render.Renderable;
-import java.awt.Point;
+import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 
-public class AnimatedEntity extends Entity implements Renderable {
+public class AnimatedEntity extends Entity {
 
     private final ArrayList<BufferedImage> images;
     private int currentIndex = 0;
@@ -23,7 +22,7 @@ public class AnimatedEntity extends Entity implements Renderable {
     }
 
     @Override
-    public void update() {
+    protected void applyLogic() {
         // Delay between loops.
         if (interLoopWaitedTicks == interLoopTicks) {
             // Delay between frames.
@@ -45,12 +44,8 @@ public class AnimatedEntity extends Entity implements Renderable {
     }
 
     @Override
-    public BufferedImage getImage() {
-        return images.get(currentIndex);
+    protected void drawSelf(Graphics2D g2) {
+        g2.drawImage(images.get(currentIndex), null, 0, 0);
     }
 
-    @Override
-    public Point getLocation() {
-        return super.getLocation();
-    }
 }

@@ -1,28 +1,25 @@
 package j2dgl.ui;
 
+import j2dgl.InputHandler;
 import j2dgl.render.Renderer;
 import j2dgl.update.Updater;
-import java.awt.Point;
-import utility.BooleanHolder;
 
 public abstract class Controller {
     
     protected final Updater updater;
     protected final Renderer renderer;
-    protected final Point mouse;
-    protected final BooleanHolder mouseDown;
+    protected final InputHandler inputHandler;
 
-    public Controller(Updater updater, Renderer renderer, Point mouse, BooleanHolder mouseDown) {
+    public Controller(Updater updater, Renderer renderer, InputHandler inputHandler) {
         this.updater = updater;
         this.renderer = renderer;
-        this.mouse = mouse;
-        this.mouseDown = mouseDown;
+        this.inputHandler = inputHandler;
     }
     
     protected void registerComponents(UIComponent... components) {
         for (UIComponent component : components) {
             updater.addUpdatable(component);
-            renderer.addRenderable(component);
+            renderer.addDrawable(component);
         }
     }
     

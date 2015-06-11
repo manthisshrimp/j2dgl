@@ -1,53 +1,53 @@
 package j2dgl.ui;
 
-import utility.BooleanHolder;
+import j2dgl.InputHandler;
 import java.awt.Color;
+import java.awt.Font;
 import java.awt.FontMetrics;
 import java.awt.Graphics2D;
-import java.awt.Point;
+import java.awt.image.BufferedImage;
 
 public class Label extends UIComponent {
 
-    private boolean determineSizeOnDraw = false;
-    
+    private Font font;
+
     public Color foregroundColor = Color.BLACK;
     public String text = "";
     public boolean centerTextX = false;
     public boolean centerTextY = true;
-    
-    public Label(double x, double y, int width, int height, String text, Point mouse, BooleanHolder mouseDown) {
-        super(x, y, width, height, mouse, mouseDown);
+
+    public Label(double x, double y, int width, int height, String text, Font font, InputHandler inputHandler) {
+        super(x, y, width, height, inputHandler);
         this.text = text;
+        this.font = font;
+        resize();
     }
 
-    public Label(double x, double y, int width, int height, String text, Point mouse,
-            BooleanHolder mouseDown, Color fgColor, Color bgColor) {
-        this(x, y, width, height, text, mouse, mouseDown);
+    public Label(double x, double y, int width, int height, String text, Font font,
+            InputHandler inputHandler, Color fgColor, Color bgColor) {
+        this(x, y, width, height, text, font, inputHandler);
         this.foregroundColor = fgColor;
         this.backgroundColor = bgColor;
     }
 
-    public Label(double x, double y, String text, Point mouse, BooleanHolder mouseDown) {
-        super(x, y, 10, 10, mouse, mouseDown);
-        determineSizeOnDraw = true;
+    public Label(double x, double y, String text, Font font, InputHandler inputHandler) {
+        super(x, y, 10, 10, inputHandler);
+        this.font = font;
         this.text = text;
+        resize();
     }
 
     @Override
-    protected void draw(Graphics2D g2) {
+    public void drawSelf(Graphics2D g2) {
+        Font oldFont = g2.getFont();
+        if (font != null) {
+            g2.setFont(font);
+        }
         drawBackground(g2);
         if (text != null) {
             FontMetrics fm = g2.getFontMetrics();
             int textHeight = fm.getHeight();
             int textWidth = fm.stringWidth(text);
-            if (determineSizeOnDraw) {
-                if (width != textWidth || height != textHeight) {
-                    width = textWidth;
-                    height = textHeight;
-                    initializeGraphics();
-                }
-                determineSizeOnDraw = false;
-            }
             int drawHeight;
             if (centerTextY) {
                 drawHeight = textHeight + (height - textHeight) - (textHeight / 2);
@@ -61,15 +61,19 @@ public class Label extends UIComponent {
                 g2.drawString(text, 5, drawHeight);
             }
         }
-    }
-
-    @Override
-    public void update() {
-        // Nothing to update.
+        g2.setFont(oldFont);
     }
 
     public void setTextAndResize(String text) {
         this.text = text;
-        determineSizeOnDraw = true;
+        resize();
+    }
+
+    private void resize() {
+        Graphics2D g2 = new BufferedImage(2, 2, BufferedImage.SCALE_FAST).createGraphics();
+        g2.setFont(font);
+        FontMetrics fm = g2.getFontMetrics();
+        height = fm.getHeight();
+        width = fm.stringWidth(text);
     }
 }

@@ -1,22 +1,20 @@
 package j2dgl.ui;
 
-import utility.BooleanHolder;
-import j2dgl.entity.DrawableEntity;
+import j2dgl.InputHandler;
+import j2dgl.entity.Entity;
 import java.awt.Color;
 import java.awt.Graphics2D;
-import java.awt.Point;
 
-public abstract class UIComponent extends DrawableEntity {
+public abstract class UIComponent extends Entity {
 
-    protected final Point mouse;
-    protected final BooleanHolder mouseDown;
+    protected InputHandler inputHandler;
+    
     public Color borderColor = Color.DARK_GRAY;
     public Color backgroundColor = Color.GRAY;
 
-    public UIComponent(double x, double y, int width, int height, Point mouse, BooleanHolder mouseDown) {
+    public UIComponent(double x, double y, int width, int height, InputHandler inputHandler) {
         super(x, y, width, height);
-        this.mouse = mouse;
-        this.mouseDown = mouseDown;
+        this.inputHandler = inputHandler;
     }
 
     protected void drawBorder(Graphics2D g2) {

@@ -1,6 +1,8 @@
 package j2dgl.update;
 
-public interface Updatable {
+import j2dgl.Disposable;
+
+public interface Updatable extends Disposable {
     
     public void update();
     
