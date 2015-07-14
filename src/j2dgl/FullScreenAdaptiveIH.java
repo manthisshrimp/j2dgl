@@ -14,10 +14,13 @@ public class FullScreenAdaptiveIH extends InputHandler {
 
     @Override
     public Point getMouse() {
-        Point mouse = super.getMouse();
+        Point mouse;
         if (frame.isFullscreen()) {
+            mouse = super.getRawMouse();
             mouse.x *= (frame.getContentWidth() / (double) frame.getWidth());
             mouse.y *= (frame.getContentHeight() / (double) frame.getHeight());
+        } else {
+            mouse = super.getMouse();
         }
         return mouse;
     }

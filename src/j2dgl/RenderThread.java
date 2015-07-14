@@ -18,16 +18,16 @@ public class RenderThread extends Thread {
     private long iteration = 0;
 
     private final boolean fullScreen;
-    private final Dimension screenResolution;
+    private final Dimension targetResolution;
     private final Dimension contentResolution;
 
     private boolean rendering = true;
     private final Drawable drawable;
 
-    public RenderThread(boolean fullScreen, Dimension screenResolution, Dimension contentResolution,
+    public RenderThread(boolean fullScreen, Dimension targetResolution, Dimension contentResolution,
             BufferStrategy buffer, Insets insets, Drawable drawable) {
         this.fullScreen = fullScreen;
-        this.screenResolution = screenResolution;
+        this.targetResolution = targetResolution;
         this.contentResolution = contentResolution;
         this.buffer = buffer;
         this.insets = insets;
@@ -55,7 +55,7 @@ public class RenderThread extends Thread {
                         g2.translate(insets.left, insets.top);
                     }
 
-                    double ratio = screenResolution.width / (double) contentResolution.width;
+                    double ratio = targetResolution.width / (double) contentResolution.width;
                     g2.scale(ratio, ratio);
 
                     g2.setColor(Color.black);

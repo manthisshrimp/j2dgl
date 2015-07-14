@@ -3,6 +3,7 @@ package j2dgl.render;
 import j2dgl.RenderThread;
 import java.awt.Cursor;
 import java.awt.Dimension;
+import java.awt.Frame;
 import java.awt.GraphicsDevice;
 import java.awt.GraphicsEnvironment;
 import java.awt.HeadlessException;
@@ -19,8 +20,8 @@ public class J2DGLFrame extends javax.swing.JFrame {
     private final Dimension contentResolution;
     private boolean fullscreen = false;
     private final Drawable drawable;
-    private long resizeStarted;
-    private boolean selfTriggeredResize = false;
+//    private long resizeStarted;
+//    private boolean selfTriggeredResize = false;
 
     public J2DGLFrame(Dimension contentResolution, Drawable drawable) throws HeadlessException {
         this.contentResolution = contentResolution;
@@ -62,69 +63,62 @@ public class J2DGLFrame extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void formComponentResized(java.awt.event.ComponentEvent evt) {//GEN-FIRST:event_formComponentResized
-        if (fullscreen || renderThread == null || selfTriggeredResize) {
-            selfTriggeredResize = false;
-            return;
-        }
-        if (resizeStarted == 0) {
-            resizeStarted = System.nanoTime();
-            renderThread.stopRendering();
-            new Thread() {
-
-                @Override
-                public void run() {
-                    while (System.nanoTime() - resizeStarted < 250000000) {
-                        // wait
-                    }
-                    renderThread = new RenderThread(false, getSize(), contentResolution,
-                            getBufferStrategy(), getInsets(), drawable);
-                    renderThread.start();
-                    resizeStarted = 0;
-                    double ratio = contentResolution.height / (double) contentResolution.width;
-                    selfTriggeredResize = true;
-                    setSize(getWidth(), (int) (getWidth() * ratio));
-                }
-
-            }.start();
-        }
-        resizeStarted = System.nanoTime();
+//        if (fullscreen || renderThread == null || selfTriggeredResize) {
+//            selfTriggeredResize = false;
+//            return;
+//        }
+//        if (resizeStarted == 0) {
+//            resizeStarted = System.nanoTime();
+//            renderThread.stopRendering();
+//            new Thread() {
+//
+//                @Override
+//                public void run() {
+//                    while (System.nanoTime() - resizeStarted < 250000000) {
+//                        // wait
+//                    }
+//                    renderThread = new RenderThread(false, getSize(), contentResolution,
+//                            getBufferStrategy(), getInsets(), drawable);
+//                    renderThread.start();
+//                    resizeStarted = 0;
+//                    double ratio = contentResolution.height / (double) contentResolution.width;
+//                    selfTriggeredResize = true;
+//                    setSize(getWidth(), (int) (getWidth() * ratio));
+//                }
+//
+//            }.start();
+//        }
+//        resizeStarted = System.nanoTime();
     }//GEN-LAST:event_formComponentResized
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     // End of variables declaration//GEN-END:variables
-    public void setFullscreen(boolean fullscreen) {
+    public void setFullscreen(boolean makeFullscreen) {
         if (renderThread == null) {
             return;
         }
+        this.fullscreen = makeFullscreen;
         renderThread.stopRendering();
-        this.fullscreen = fullscreen;
-        if (fullscreen) {
-            renderThread.stopRendering();
-            setVisible(false);
-            dispose();
+        setVisible(false);
+        dispose();
+        Dimension targetResolution;
+        if (makeFullscreen) {
             setUndecorated(true);
             screenDevice.setFullScreenWindow(this);
-            setLocationRelativeTo(null);
-            setVisible(true);
-            renderThread = new RenderThread(true, getSize(), contentResolution,
-                    getBufferStrategy(), getInsets(), drawable);
-            requestFocus();
+            targetResolution = getSize();
         } else {
-            renderThread.stopRendering();
-            setVisible(false);
-            dispose();
             setUndecorated(false);
             screenDevice.setFullScreenWindow(null);
-            setLocationRelativeTo(null);
-            setVisible(true);
-            renderThread = new RenderThread(false, getSize(), contentResolution,
-                    getBufferStrategy(), getInsets(), drawable);
-            requestFocus();
+            targetResolution = contentResolution;
         }
+        setState(Frame.NORMAL);
+        setLocationRelativeTo(null);
+        setVisible(true);
+        requestFocus();
+        toFront();
+        renderThread = new RenderThread(makeFullscreen, targetResolution, contentResolution,
+                getBufferStrategy(), getInsets(), drawable);
         renderThread.start();
-        java.awt.EventQueue.invokeLater(() -> {
-            toFront();
-        });
     }
 
     public void setMouseVisible(boolean mouseVisible) {
@@ -151,11 +145,11 @@ public class J2DGLFrame extends javax.swing.JFrame {
     }
 
     @Override
-    public void setVisible(boolean b) {
-        super.setVisible(b);
+    public void setVisible(boolean visible) {
+        super.setVisible(visible);
         createBufferStrategy(2);
-        if (b && renderThread == null) {
-            renderThread = new RenderThread(false, getSize(), contentResolution,
+        if (visible && renderThread == null) {
+            renderThread = new RenderThread(false, contentResolution, contentResolution,
                     getBufferStrategy(), getInsets(), drawable);
             renderThread.start();
         }

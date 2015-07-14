@@ -1,6 +1,8 @@
 package j2dgl;
 
 import java.awt.Component;
+import java.awt.Container;
+import java.awt.Insets;
 import java.awt.Point;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
@@ -13,6 +15,8 @@ import java.util.List;
 public class InputHandler {
 
     private final ArrayList<Integer> keyQueue = new ArrayList<>();
+    private int TOP_INSET = 0;
+    private int LEFT_INSET = 0;
     private boolean mouseDown = false;
     private Point mouse = new Point(-1, -1);
 
@@ -20,6 +24,11 @@ public class InputHandler {
         inputComponent.addKeyListener(keyListener);
         inputComponent.addMouseListener(mouseListener);
         inputComponent.addMouseMotionListener(mouseListener);
+        if (inputComponent instanceof Container) {
+            Insets insets = ((Container) inputComponent).getInsets();
+            TOP_INSET = insets.top;
+            LEFT_INSET = insets.left;
+        }
     }
 
     private final KeyAdapter keyListener = new KeyAdapter() {
@@ -96,7 +105,11 @@ public class InputHandler {
     }
 
     public Point getMouse() {
-        return mouse;
+        return new Point(mouse.x - LEFT_INSET, mouse.y - TOP_INSET);
+    }
+
+    public Point getRawMouse() {
+        return (Point) mouse.clone();
     }
 
     public boolean isMouseDown() {
