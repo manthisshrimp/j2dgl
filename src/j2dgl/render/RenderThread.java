@@ -1,6 +1,5 @@
-package j2dgl;
+package j2dgl.render;
 
-import j2dgl.render.Drawable;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics2D;
@@ -22,16 +21,16 @@ public class RenderThread extends Thread {
     private final Dimension contentResolution;
 
     private boolean rendering = true;
-    private final Drawable drawable;
+    private final CoreDrawable coreDrawable;
 
     public RenderThread(boolean fullScreen, Dimension targetResolution, Dimension contentResolution,
-            BufferStrategy buffer, Insets insets, Drawable drawable) {
+            BufferStrategy buffer, Insets insets, CoreDrawable coreDrawable) {
         this.fullScreen = fullScreen;
         this.targetResolution = targetResolution;
         this.contentResolution = contentResolution;
         this.buffer = buffer;
         this.insets = insets;
-        this.drawable = drawable;
+        this.coreDrawable = coreDrawable;
     }
 
     @Override
@@ -61,13 +60,9 @@ public class RenderThread extends Thread {
                     g2.setColor(Color.black);
                     g2.fillRect(0, 0, contentResolution.width, contentResolution.height);
 
-                    drawable.draw(g2, 0, 0);
-
-//                    if (core.showDebug) {
-//                        core.drawDebug(g2);
-//                        g2.setColor(Color.GREEN);
-//                        g2.drawString(String.valueOf(fps), 5, 15);
-//                    }
+                    coreDrawable.draw(g2, 0, 0);
+                    coreDrawable.drawDebug(g2, 0, 0, fps);
+                    
                     if (!buffer.contentsLost()) {
                         buffer.show();
                     } else {

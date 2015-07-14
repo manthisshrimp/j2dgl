@@ -1,6 +1,5 @@
 package j2dgl.render;
 
-import j2dgl.RenderThread;
 import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.Frame;
@@ -15,17 +14,19 @@ import java.awt.image.BufferedImage;
 public class J2DGLFrame extends javax.swing.JFrame {
 
     private final GraphicsDevice screenDevice
-            = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice();
+            = GraphicsEnvironment
+            .getLocalGraphicsEnvironment()
+            .getDefaultScreenDevice();
     private RenderThread renderThread;
     private final Dimension contentResolution;
+    private final CoreDrawable coreDrawable;
     private boolean fullscreen = false;
-    private final Drawable drawable;
 //    private long resizeStarted;
 //    private boolean selfTriggeredResize = false;
 
-    public J2DGLFrame(Dimension contentResolution, Drawable drawable) throws HeadlessException {
+    public J2DGLFrame(Dimension contentResolution, CoreDrawable coreDrawable) throws HeadlessException {
         this.contentResolution = contentResolution;
-        this.drawable = drawable;
+        this.coreDrawable = coreDrawable;
 
         initComponents();
 
@@ -117,7 +118,7 @@ public class J2DGLFrame extends javax.swing.JFrame {
         requestFocus();
         toFront();
         renderThread = new RenderThread(makeFullscreen, targetResolution, contentResolution,
-                getBufferStrategy(), getInsets(), drawable);
+                getBufferStrategy(), getInsets(), coreDrawable);
         renderThread.start();
     }
 
@@ -150,7 +151,7 @@ public class J2DGLFrame extends javax.swing.JFrame {
         createBufferStrategy(2);
         if (visible && renderThread == null) {
             renderThread = new RenderThread(false, contentResolution, contentResolution,
-                    getBufferStrategy(), getInsets(), drawable);
+                    getBufferStrategy(), getInsets(), coreDrawable);
             renderThread.start();
         }
     }

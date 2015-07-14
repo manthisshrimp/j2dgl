@@ -1,6 +1,6 @@
 package j2dgl;
 
-import j2dgl.render.Drawable;
+import j2dgl.render.CoreDrawable;
 import j2dgl.render.J2DGLFrame;
 import java.awt.Color;
 import java.awt.Dimension;
@@ -9,7 +9,7 @@ import java.awt.Graphics2D;
 import java.awt.event.KeyEvent;
 import javax.swing.JOptionPane;
 
-public abstract class Core implements Drawable {
+public abstract class Core implements CoreDrawable {
 
     // Core Variables
     private int updateRate = 60;
@@ -69,13 +69,16 @@ public abstract class Core implements Drawable {
         System.exit(0);
     }
 
-    protected abstract void update();
+    protected void update() {
+
+    }
 
     protected void beforeClose() {
 
     }
 
-    public void drawDebug(Graphics2D g2) {
+    @Override
+    public void drawDebug(Graphics2D g2, int xOffset, int yOffset, int fps) {
         g2.setColor(Color.BLACK);
         g2.fillRect(0, 0, 160, contentResolution.height);
         g2.setColor(Color.WHITE);
