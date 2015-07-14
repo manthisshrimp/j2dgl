@@ -79,18 +79,23 @@ public abstract class Core implements CoreDrawable {
 
     @Override
     public void drawDebug(Graphics2D g2, int xOffset, int yOffset, int fps) {
-        g2.setColor(Color.BLACK);
-        g2.fillRect(0, 0, 160, contentResolution.height);
-        g2.setColor(Color.WHITE);
-        g2.setFont(new Font("Serif", Font.BOLD, 14));
-        g2.drawString("Update Rate: " + updateRate, 8, 40);
+        if (showDebug) {
 
-        g2.setColor(Color.WHITE);
-        g2.drawString("Mouse X: " + inputHandler.getMouse().x, 8, 60);
-        g2.drawString("Mouse Y: " + inputHandler.getMouse().y, 8, 80);
-        g2.drawString("Mouse Down: " + inputHandler.isMouseDown(), 8, 100);
-        g2.drawString("SleepTime: " + sleepTime + "ms", 8, 140);
-        g2.drawString("Keys: " + inputHandler.viewPressedKeys(), 8, 140);
+            g2.setColor(Color.BLACK);
+            g2.fillRect(0, 0, 160, contentResolution.height);
+            g2.setColor(Color.WHITE);
+            g2.setFont(new Font("Serif", Font.BOLD, 14));
+            g2.drawString("Update Rate: " + updateRate, 8, 40);
+
+            g2.setColor(getFractionColor(Color.RED, Color.GREEN, ((double) fps) / 60));
+            g2.drawString("FPS: " + fps, 8, 20);
+            g2.setColor(Color.WHITE);
+            g2.drawString("Mouse X: " + inputHandler.getMouse().x, 8, 60);
+            g2.drawString("Mouse Y: " + inputHandler.getMouse().y, 8, 80);
+            g2.drawString("Mouse Down: " + inputHandler.isMouseDown(), 8, 100);
+            g2.drawString("SleepTime: " + sleepTime + "ms", 8, 140);
+            g2.drawString("Keys: " + inputHandler.viewPressedKeys(), 8, 160);
+        }
     }
 
     private void handleCoreKeyEvents() {
@@ -118,4 +123,15 @@ public abstract class Core implements CoreDrawable {
                 JOptionPane.ERROR_MESSAGE);
         exit();
     }
+
+    private Color getFractionColor(Color startColor, Color endColor, double fraction) {
+        if (fraction < 0 || fraction > 1) {
+            fraction = 1;
+        }
+        int red = (int) (fraction * endColor.getRed() + (1 - fraction) * startColor.getRed());
+        int green = (int) (fraction * endColor.getGreen() + (1 - fraction) * startColor.getGreen());
+        int blue = (int) (fraction * endColor.getBlue() + (1 - fraction) * startColor.getBlue());
+        return new Color(red, green, blue);
+    }
+
 }
