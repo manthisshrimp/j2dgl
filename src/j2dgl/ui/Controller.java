@@ -1,6 +1,6 @@
 package j2dgl.ui;
 
-import j2dgl.InputHandler;
+import j2dgl.input.InputHandler;
 import j2dgl.render.Renderer;
 import j2dgl.update.Updater;
 

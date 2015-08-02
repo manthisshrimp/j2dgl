@@ -1,6 +1,6 @@
 package j2dgl.ui;
 
-import j2dgl.InputHandler;
+import j2dgl.input.InputHandler;
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.Point;

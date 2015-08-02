@@ -1,4 +1,4 @@
-package j2dgl;
+package j2dgl.input;
 
 import j2dgl.render.J2DGLFrame;
 import java.awt.Point;

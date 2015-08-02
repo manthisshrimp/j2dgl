@@ -66,7 +66,7 @@ public abstract class Entity implements Updatable, Drawable {
 
     }
 
-    public final void applyMovement(int xDelta, int yDelta, double speed) {
+    public final void applyMovement(double xDelta, double yDelta, double speed) {
         double tDelta = Math.sqrt(Math.pow(xDelta, 2) + Math.pow(yDelta, 2));
         if (tDelta > 0 && speed > 0) {
             xIncrement = xDelta / tDelta * speed;

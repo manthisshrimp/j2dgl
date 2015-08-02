@@ -1,5 +1,6 @@
 package j2dgl;
 
+import j2dgl.input.FullScreenAdaptiveIH;
 import j2dgl.render.CoreDrawable;
 import j2dgl.render.J2DGLFrame;
 import java.awt.Color;
@@ -38,17 +39,12 @@ public abstract class Core implements CoreDrawable {
     }
 
     public final void startLoop() {
-
         frame = new J2DGLFrame(contentResolution, this);
         inputHandler = new FullScreenAdaptiveIH(frame);
-
         init();
-
         frame.setVisible(true);
-
         long beginTime;
         long timeTaken;
-
         while (running) {
             beginTime = System.nanoTime();
             handleCoreKeyEvents();
@@ -63,7 +59,6 @@ public abstract class Core implements CoreDrawable {
                     showErrorAndExit(ex.toString());
                 }
             }
-
         }
         beforeClose();
         System.exit(0);
@@ -80,13 +75,11 @@ public abstract class Core implements CoreDrawable {
     @Override
     public void drawDebug(Graphics2D g2, int xOffset, int yOffset, int fps) {
         if (showDebug) {
-
             g2.setColor(Color.BLACK);
             g2.fillRect(0, 0, 160, contentResolution.height);
             g2.setColor(Color.WHITE);
             g2.setFont(new Font("Serif", Font.BOLD, 14));
             g2.drawString("Update Rate: " + updateRate, 8, 40);
-
             g2.setColor(getFractionColor(Color.RED, Color.GREEN, ((double) fps) / 60));
             g2.drawString("FPS: " + fps, 8, 20);
             g2.setColor(Color.WHITE);
@@ -125,8 +118,10 @@ public abstract class Core implements CoreDrawable {
     }
 
     private Color getFractionColor(Color startColor, Color endColor, double fraction) {
-        if (fraction < 0 || fraction > 1) {
+        if (fraction > 1) {
             fraction = 1;
+        } else if (fraction < 0) {
+            fraction = 0;
         }
         int red = (int) (fraction * endColor.getRed() + (1 - fraction) * startColor.getRed());
         int green = (int) (fraction * endColor.getGreen() + (1 - fraction) * startColor.getGreen());

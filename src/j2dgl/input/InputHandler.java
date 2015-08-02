@@ -1,4 +1,4 @@
-package j2dgl;
+package j2dgl.input;
 
 import java.awt.Component;
 import java.awt.Container;
