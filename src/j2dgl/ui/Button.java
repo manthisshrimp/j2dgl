@@ -10,9 +10,6 @@ public class Button extends UIComponent {
     private final Runnable runnable;
     private boolean waitingForRealease = false;
 
-    protected int labelXOffset = 0;
-    protected int labelYOffset = 0;
-
     public Color bgHoverColor = new Color(0x454545);
     public Color bgMouseDownColor = new Color(0x1A1A1A);
 
@@ -30,6 +27,8 @@ public class Button extends UIComponent {
     public void drawSelf(Graphics2D g2) {
         drawBackground(g2);
         drawBorder(g2);
+        int labelXOffset;
+        int labelYOffset;
         if (getBounds().contains(inputHandler.getMouse())) {
             drawMouseHoverLook(g2);
             if (inputHandler.isMouseDown()) {

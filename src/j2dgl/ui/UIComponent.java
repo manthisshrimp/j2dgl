@@ -8,7 +8,7 @@ import java.awt.Graphics2D;
 public abstract class UIComponent extends Entity {
 
     protected InputHandler inputHandler;
-    
+
     public Color borderColor = Color.DARK_GRAY;
     public Color backgroundColor = Color.GRAY;
 

@@ -30,7 +30,7 @@ public class Slider extends UIComponent {
         this.maxValue = maxValue;
         this.value = initialValue;
         lineWidth = width - sidePadding / 2;
-        // Rectangle in screen level space to facilitate comparisons with mouse.
+        // Rectangle coordinates in screen level space to facilitate comparisons with mouse.
         grabber = new Rectangle((int) x + sidePadding, (int) (height - GRABBER_SIZE - 3 + y), GRABBER_SIZE, GRABBER_SIZE);
         setValue(value);
         // The value label's coordinates are in local space.
@@ -64,9 +64,8 @@ public class Slider extends UIComponent {
             g2.fillRect((int) (grabber.x - x) + 1, (int) (grabber.y - y) + 1, grabber.width - 1, grabber.height - 1);
         }
         // Draw the label
-        int drawX = (int) (grabber.x - x + grabber.width / 2 - valueLabel.width / 2);
-//        g2.drawImage(valueLabel.getImage(), null, drawX, (int) valueLabel.y);
-//        valueLabel.draw(g2, drawX, height);
+        valueLabel.x = (grabber.x - x + grabber.width / 2 - valueLabel.width / 2);
+        valueLabel.draw(g2, 0, 0);
     }
 
     @Override
@@ -112,13 +111,13 @@ public class Slider extends UIComponent {
     }
 
     public final void setValue(int value) {
-        if (value > getMaxValue()) {
-            this.value = getMaxValue();
+        if (value > maxValue) {
+            this.value = maxValue;
         }
-        if (value < getMinValue()) {
-            this.value = getMinValue();
+        if (value < minValue) {
+            this.value = minValue;
         }
-        double ratio = (double) value / getMaxValue();
+        double ratio = (double) value / maxValue;
         grabber.x = (int) (this.x + sidePadding + ratio * lineWidth);
         if (valueLabel != null) {
             valueLabel.setTextAndResize("" + value);

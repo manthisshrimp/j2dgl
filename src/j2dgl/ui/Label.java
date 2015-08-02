@@ -20,7 +20,6 @@ public class Label extends UIComponent {
         super(x, y, width, height, inputHandler);
         this.text = text;
         this.font = font;
-        resize();
     }
 
     public Label(double x, double y, int width, int height, String text, Font font,
