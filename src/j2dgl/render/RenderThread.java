@@ -9,12 +9,14 @@ import java.awt.image.BufferStrategy;
 
 public class RenderThread extends Thread {
 
+    private final long ONE_SECOND_IN_NS = 1000000000;
+
     private Graphics2D g2;
     private final BufferStrategy buffer;
     private final Insets insets;
 
     private int fps;
-    private long iteration = 0;
+    private int frameCount = 0;
 
     private final boolean fullScreen;
     private final Dimension targetResolution;
@@ -35,16 +37,15 @@ public class RenderThread extends Thread {
 
     @Override
     public void run() {
-        long timeBeginLoop = System.nanoTime();
+        long lastFPSUpdate = System.nanoTime();
         while (rendering) {
             try {
                 if (buffer != null) {
-                    iteration++;
-                    if ((iteration % 15) == 0) {
-                        fps = (int) ((1 / ((float) (System.nanoTime() - timeBeginLoop))) * 1000000000);
+                    if (System.nanoTime() > lastFPSUpdate + ONE_SECOND_IN_NS) {
+                        fps = frameCount;
+                        frameCount = 0;
+                        lastFPSUpdate = System.nanoTime();
                     }
-                    timeBeginLoop = System.nanoTime();
-
                     g2 = (Graphics2D) buffer.getDrawGraphics();
                     g2.setRenderingHint(
                             RenderingHints.KEY_TEXT_ANTIALIASING,
@@ -62,12 +63,13 @@ public class RenderThread extends Thread {
 
                     coreDrawable.draw(g2, 0, 0);
                     coreDrawable.drawDebug(g2, 0, 0, fps);
-                    
+
                     if (!buffer.contentsLost()) {
                         buffer.show();
                     } else {
                         System.out.println("Buffer contents lost");
                     }
+                    frameCount++;
                 }
             } catch (NullPointerException ex) {
                 // Try to go on...
