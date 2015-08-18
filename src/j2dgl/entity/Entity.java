@@ -11,8 +11,8 @@ public abstract class Entity implements Updatable, Drawable {
 
     private boolean disposeLater = false;
 
-    public double xIncrement = 0;
-    public double yIncrement = 0;
+    public double xVelocity = 0;
+    public double yVelocity = 0;
     public double x;
     public double y;
     public int width;
@@ -21,7 +21,8 @@ public abstract class Entity implements Updatable, Drawable {
     public double drag = 0;
     public boolean visible = true;
 
-    public Point target = null;
+    private Point target = null;
+    private Rectangle bounds = null;
 
     public Entity(double x, double y, int width, int height) {
         this.x = x;
@@ -34,12 +35,22 @@ public abstract class Entity implements Updatable, Drawable {
         this(x, y, width, height);
         this.drag = drag;
     }
+    
+    public Entity(double x, double y, double mass, int width, int height) {
+        this(x, y, width, height);
+        this.mass = mass;
+    }
+    
+    public Entity(double x, double y, double mass, int width, int height, double drag) {
+        this(x, y, mass, width, height);
+        this.drag = drag;
+    }
 
     @Override
     public final void update() {
         applyLogic();
-        x += xIncrement;
-        y += yIncrement;
+        x += xVelocity;
+        y += yVelocity;
         if (target != null) {
             checkTargetReached();
         }
@@ -66,11 +77,11 @@ public abstract class Entity implements Updatable, Drawable {
 
     }
 
-    public final void applyMovement(double xDelta, double yDelta, double speed) {
+    public final void setVelocity(double xDelta, double yDelta, double speed) {
         double tDelta = Math.sqrt(Math.pow(xDelta, 2) + Math.pow(yDelta, 2));
         if (tDelta > 0 && speed > 0) {
-            xIncrement = xDelta / tDelta * speed;
-            yIncrement = yDelta / tDelta * speed;
+            xVelocity = xDelta / tDelta * speed;
+            yVelocity = yDelta / tDelta * speed;
         }
     }
 
@@ -80,72 +91,73 @@ public abstract class Entity implements Updatable, Drawable {
 
     public final void setTargetAndMove(int x, int y, double speed) {
         setTarget(x, y);
-        applyMovement(x, y, speed);
+        setVelocity(x, y, speed);
     }
 
     private void checkTargetReached() {
-        if (yIncrement < 0 && y <= target.y || yIncrement > 0 && y >= target.y) {
-            yIncrement = 0;
+        if ((yVelocity < 0 && y <= target.y) || (yVelocity > 0 && y >= target.y)) {
+            yVelocity = 0;
             y = target.y;
         }
-        if (xIncrement < 0 && x <= target.x || xIncrement > 0 && x >= target.x) {
-            xIncrement = 0;
+        if ((xVelocity < 0 && x <= target.x) || (xVelocity > 0 && x >= target.x)) {
+            xVelocity = 0;
             x = target.x;
         }
     }
 
     private void applyResistance() {
-        // Calculate current speed
-        double speed = Math.sqrt(Math.pow(xIncrement, 2) + Math.pow(yIncrement, 2));
+//         Calculate current speed.
+        double speed = Math.sqrt(Math.pow(xVelocity, 2) + Math.pow(yVelocity, 2));
+//        So the object eventually stops.
         if (speed > 0.05) {
-            // Calculate current direction
-            double xRatio = xIncrement / speed;
-            double yRatio = yIncrement / speed;
-            // Calcualte decelarating force
-            double dec = drag * speed;
-            // Apply decelaration
-            xIncrement += (-xRatio) * dec;
-            yIncrement += (-yRatio) * dec;
+//             Calculate current direction.
+            double xRatio = xVelocity / speed;
+            double yRatio = yVelocity / speed;
+//             Calcualte decelaration.
+            double deceleration = drag * speed;
+//             Apply deceleration.
+            xVelocity += (-xRatio) * deceleration;
+            yVelocity += (-yRatio) * deceleration;
         } else {
-            xIncrement = 0;
-            yIncrement = 0;
+            xVelocity = 0;
+            yVelocity = 0;
         }
     }
 
     public void applyForce(double force, double xDirr, double yDirr) {
         if (mass != 0) {
-            // Calculate accelaration to be applied
-            double acc = force / mass;
-            // Calculate direction
+            // Calculate acceleration to be applied.
+            double acceleration = force / mass;
+            // Calculate direction.
             double dirDist = Math.sqrt(Math.pow(xDirr, 2) + Math.pow(yDirr, 2));
             double xRatio = xDirr / dirDist;
             double yRatio = yDirr / dirDist;
-            // Apply accelaration using direction
-            xIncrement += xRatio * acc;
-            yIncrement += yRatio * acc;
+            // Apply acceleration using direction.
+            xVelocity += xRatio * acceleration;
+            yVelocity += yRatio * acceleration;
         }
     }
 
-    public final void processCollision(Entity otherEntity) {
+    public final void processMomentumCollision(Entity otherEntity) {
         double m1 = this.mass;
         double m2 = otherEntity.mass;
 
         // Adjust speeds based on momentum exchange
-        double thisNewXSpeed = (((m1 - m2) / (m1 + m2)) * this.xIncrement)
-                + (((m2 * 2) / (m1 + m2)) * otherEntity.xIncrement);
-        double thisNewYSpeed = (((m1 - m2) / (m1 + m2)) * this.yIncrement)
-                + (((m2 * 2) / (m1 + m2)) * otherEntity.yIncrement);
+        double thisNewXSpeed = (((m1 - m2) / (m1 + m2)) * this.xVelocity)
+                + (((m2 * 2) / (m1 + m2)) * otherEntity.xVelocity);
+        double thisNewYSpeed = (((m1 - m2) / (m1 + m2)) * this.yVelocity)
+                + (((m2 * 2) / (m1 + m2)) * otherEntity.yVelocity);
 
-        double otherNewXSpeed = (((m2 - m1) / (m1 + m2)) * otherEntity.xIncrement)
-                + (((m1 * 2) / (m1 + m2)) * this.xIncrement);
-        double otherNewYSpeed = (((m2 - m1) / (m1 + m2)) * otherEntity.yIncrement)
-                + (((m1 * 2) / (m1 + m2)) * this.yIncrement);
+        double otherNewXSpeed = (((m2 - m1) / (m1 + m2)) * otherEntity.xVelocity)
+                + (((m1 * 2) / (m1 + m2)) * this.xVelocity);
+        double otherNewYSpeed = (((m2 - m1) / (m1 + m2)) * otherEntity.yVelocity)
+                + (((m1 * 2) / (m1 + m2)) * this.yVelocity);
 
-        this.xIncrement = thisNewXSpeed;
-        this.yIncrement = thisNewYSpeed;
+        this.xVelocity = thisNewXSpeed;
+        this.yVelocity = thisNewYSpeed;
 
-        otherEntity.xIncrement = otherNewXSpeed;
-        otherEntity.yIncrement = otherNewYSpeed;
+        otherEntity.xVelocity = otherNewXSpeed;
+        otherEntity.yVelocity = otherNewYSpeed;
     }
 
     public boolean intersects(Entity otherEntity) {
@@ -154,22 +166,25 @@ public abstract class Entity implements Updatable, Drawable {
 
     public boolean aboutToIntersect(Entity otherEntity) {
         Rectangle thisFutureRect = new Rectangle(this.getBounds());
-        thisFutureRect.x += this.xIncrement;
-        thisFutureRect.y += this.yIncrement;
+        thisFutureRect.x += this.xVelocity;
+        thisFutureRect.y += this.yVelocity;
 
         Rectangle otherFutureRect = new Rectangle(otherEntity.getBounds());
-        otherFutureRect.x += otherEntity.xIncrement;
-        otherFutureRect.y += otherEntity.yIncrement;
+        otherFutureRect.x += otherEntity.xVelocity;
+        otherFutureRect.y += otherEntity.yVelocity;
 
         return thisFutureRect.intersects(otherFutureRect);
     }
 
     public Rectangle getBounds() {
-        return new Rectangle((int) x, (int) y, width, height);
-    }
-
-    public Point getLocation() {
-        return new Point((int) x, (int) y);
+        if (bounds == null) {
+            bounds = new Rectangle((int) x, (int) y, width, height);
+        }
+        bounds.x = (int) x;
+        bounds.y = (int) y;
+        bounds.width = width;
+        bounds.height = height;
+        return bounds;
     }
 
     @Override
