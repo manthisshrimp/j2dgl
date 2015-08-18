@@ -18,7 +18,7 @@ public abstract class Controller {
     
     protected void registerComponents(UIComponent... components) {
         for (UIComponent component : components) {
-            updater.addUpdatable(component);
+            updater.addEntity(component);
             renderer.addDrawable(component);
         }
     }

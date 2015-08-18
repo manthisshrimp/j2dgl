@@ -7,50 +7,46 @@ import java.util.List;
 
 public class Updater<T extends Entity> {
 
-    protected final List<T> updatables = new ArrayList<>();
+    protected final List<T> entities = new ArrayList<>();
     private final List<T> removeList = new ArrayList<>();
 
     private boolean clearRequested = false;
 
     public final void updateAll() {
-        for (T updatable : updatables) {
-            if (clearRequested) {
-                clearRequested = false;
-                break;
-            }
-            if (updatable.needsDisposal()) {
-                removeList.add(updatable);
-            } else {
-                executeUpdate(updatable);
-            }
+        if (!clearRequested) {
+            entities.stream().forEach((entity) -> {
+                if (entity.needsDisposal()) {
+                    removeList.add(entity);
+                } else {
+                    entity.update();
+                }
+            });
+        } else {
+            clearRequested = false;
         }
-        removeList.stream().forEach(updatables::remove);
+        removeList.stream().forEach(entities::remove);
         removeList.clear();
         postUpdate();
-    }
-
-    protected void executeUpdate(T updatable) {
-        updatable.update();
     }
 
     protected void postUpdate() {
 
     }
 
-    public void addUpdatable(T updatable) {
-        updatables.add(updatable);
+    public void addEntity(T entity) {
+        entities.add(entity);
     }
 
-    public void addUpdatables(T... updatables) {
-        this.updatables.addAll(Arrays.asList(updatables));
+    public void addEntities(T... entities) {
+        this.entities.addAll(Arrays.asList(entities));
     }
 
-    public List<T> getUpdatables() {
-        return updatables;
+    public List<T> getEntities() {
+        return new ArrayList<T>(entities);
     }
 
     public void clear() {
         clearRequested = true;
-        removeList.addAll(updatables);
+        removeList.addAll(entities);
     }
 }
