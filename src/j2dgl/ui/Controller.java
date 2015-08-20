@@ -1,16 +1,16 @@
 package j2dgl.ui;
 
 import j2dgl.input.InputHandler;
-import j2dgl.render.Renderer;
-import j2dgl.update.Updater;
+import j2dgl.render.EntityRenderer;
+import j2dgl.update.EntityUpdater;
 
 public abstract class Controller {
     
-    protected final Updater updater;
-    protected final Renderer renderer;
+    protected final EntityUpdater updater;
+    protected final EntityRenderer renderer;
     protected final InputHandler inputHandler;
 
-    public Controller(Updater updater, Renderer renderer, InputHandler inputHandler) {
+    public Controller(EntityUpdater updater, EntityRenderer renderer, InputHandler inputHandler) {
         this.updater = updater;
         this.renderer = renderer;
         this.inputHandler = inputHandler;

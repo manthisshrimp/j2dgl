@@ -27,6 +27,8 @@ public abstract class Core implements CoreDrawable {
 
     public Core(int width, int height) {
         this.contentResolution = new Dimension(width, height);
+        frame = new J2DGLFrame(contentResolution, this);
+        inputHandler = new FullScreenAdaptiveIH(frame);
     }
 
     public Core(int width, int height, int updateRate) {
@@ -39,8 +41,6 @@ public abstract class Core implements CoreDrawable {
     }
 
     public final void startLoop() {
-        frame = new J2DGLFrame(contentResolution, this);
-        inputHandler = new FullScreenAdaptiveIH(frame);
         init();
         frame.setVisible(true);
         long beginTime;

@@ -5,7 +5,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public class Updater<T extends Entity> {
+public class EntityUpdater<T extends Entity> {
 
     protected final List<T> entities = new ArrayList<>();
     private final List<T> removeList = new ArrayList<>();

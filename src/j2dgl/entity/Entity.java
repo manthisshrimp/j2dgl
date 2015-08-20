@@ -1,5 +1,6 @@
 package j2dgl.entity;
 
+import j2dgl.intersect.Intersectable;
 import j2dgl.render.Drawable;
 import j2dgl.update.Updatable;
 import java.awt.Graphics2D;
@@ -7,7 +8,7 @@ import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.geom.AffineTransform;
 
-public abstract class Entity implements Updatable, Drawable {
+public abstract class Entity implements Updatable, Drawable, Intersectable, Disposable {
 
     private boolean disposeLater = false;
 
@@ -48,7 +49,6 @@ public abstract class Entity implements Updatable, Drawable {
 
     @Override
     public final void update() {
-        applyLogic();
         x += xVelocity;
         y += yVelocity;
         if (target != null) {
@@ -57,6 +57,7 @@ public abstract class Entity implements Updatable, Drawable {
         if (drag > 0) {
             applyResistance();
         }
+        applyLogic();
     }
 
     protected void applyLogic() {
@@ -176,6 +177,7 @@ public abstract class Entity implements Updatable, Drawable {
         return thisFutureRect.intersects(otherFutureRect);
     }
 
+    @Override
     public Rectangle getBounds() {
         if (bounds == null) {
             bounds = new Rectangle((int) x, (int) y, width, height);
@@ -185,6 +187,11 @@ public abstract class Entity implements Updatable, Drawable {
         bounds.width = width;
         bounds.height = height;
         return bounds;
+    }
+    
+    @Override
+    public void processIntersectionWith(Intersectable intersectable) {
+        
     }
 
     @Override
