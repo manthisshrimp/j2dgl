@@ -1,2 +1,2 @@
 # j2dgl
-Repository for my Java 2D Game Library.
+Basic Java 2D Game Engine.
